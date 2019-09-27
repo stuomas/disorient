@@ -17,23 +17,19 @@ void Screen::flip(Orientation o)
     switch(o) {
     case Orientation::Landscape:
         dm.dmDisplayOrientation = DMDO_DEFAULT;
-        if(dm.dmPelsWidth < dm.dmPelsHeight)
-            std::swap(dm.dmPelsWidth, dm.dmPelsHeight);
+        adjustResolution(o, dm.dmPelsWidth, dm.dmPelsHeight);
         break;
     case Orientation::Portrait:
         dm.dmDisplayOrientation = DMDO_90;
-        if(dm.dmPelsWidth > dm.dmPelsHeight)
-            std::swap(dm.dmPelsWidth, dm.dmPelsHeight);
+        adjustResolution(o, dm.dmPelsWidth, dm.dmPelsHeight);
         break;
     case Orientation::LandscapeFlip:
         dm.dmDisplayOrientation = DMDO_180;
-        if(dm.dmPelsWidth < dm.dmPelsHeight)
-            std::swap(dm.dmPelsWidth, dm.dmPelsHeight);
+        adjustResolution(o, dm.dmPelsWidth, dm.dmPelsHeight);
         break;
     case Orientation::PortraitFlip:
         dm.dmDisplayOrientation = DMDO_270;
-        if(dm.dmPelsWidth > dm.dmPelsHeight)
-            std::swap(dm.dmPelsWidth, dm.dmPelsHeight);
+        adjustResolution(o, dm.dmPelsWidth, dm.dmPelsHeight);
         break;
     }
 
@@ -66,4 +62,35 @@ void Screen::flip(Orientation o)
             break;
         }
     }
+}
+
+void Screen::adjustResolution(Orientation o, unsigned long &w, unsigned long &h)
+{
+    switch(o) {
+    case Orientation::Landscape:
+    case Orientation::LandscapeFlip:
+        if(w < h)
+            std::swap(w, h);
+        break;
+    case Orientation::Portrait:
+    case Orientation::PortraitFlip:
+        if(w > h)
+            std::swap(w, h);
+        break;
+    }
+}
+
+void Screen::onMessageReceived(QString msg)
+{
+    //Validate text messages from the WebSocket server
+    if(msg == "portrait")
+        flip(Orientation::Portrait);
+    else if(msg == "landscape")
+        flip(Orientation::Landscape);
+    else if(msg == "portraitflipped")
+        flip(Orientation::PortraitFlip);
+    else if(msg == "landscapeflipped")
+        flip(Orientation::LandscapeFlip);
+    else
+        emit statusChanged("Message from server: " + msg);
 }

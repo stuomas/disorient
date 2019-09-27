@@ -15,11 +15,13 @@ class InputWebSocket : public QObject
     Q_OBJECT
 
 public:
-    InputWebSocket(const QUrl &addr);
+    InputWebSocket();
     ~InputWebSocket();
     void setServerUrl(const QUrl &addr);
 signals:
     void closed();
+    void messageToScreen(QString msg);
+    void sendStatusUpdate(QString msg);
 
 private slots:
     void onConnected();

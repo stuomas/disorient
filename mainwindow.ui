@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>376</width>
-    <height>188</height>
+    <height>187</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
       <height>176</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="2,2,2,2,1">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="2,2,2,2">
      <property name="spacing">
       <number>2</number>
      </property>
@@ -159,19 +159,6 @@ flipped</string>
         </widget>
        </item>
       </layout>
-     </item>
-     <item>
-      <widget class="QLabel" name="labelStatus">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
      </item>
     </layout>
    </widget>

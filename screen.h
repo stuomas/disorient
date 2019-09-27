@@ -15,8 +15,11 @@ class Screen : public QObject
 public:
     Screen();
     void flip(Orientation o);
+    void adjustResolution(Orientation o, unsigned long &w, unsigned long &h);
 signals:
     void statusChanged(QString status);
+public slots:
+    void onMessageReceived(QString msg);
 private:
     DEVMODE dm;
 };
