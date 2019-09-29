@@ -10,6 +10,7 @@
 #include <QAction>
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QSettings>
 
 namespace Ui {
 class MainWindow;
@@ -22,6 +23,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    QUrl readSettings();
+    void writeSettings(QUrl server);
 
 private slots:
     void on_pbToLandscape_clicked();

@@ -13,11 +13,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(scr, &Screen::statusChanged, this, &MainWindow::onStatusReceived);
     connect(iWebSocket, &InputWebSocket::messageToScreen, scr, &Screen::onMessageReceived);
     connect(iWebSocket, &InputWebSocket::sendStatusUpdate, this, &MainWindow::onStatusReceived);
+    ui->lineEditWebSocketAddr->setText(readSettings().toString());
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+QUrl MainWindow::readSettings()
+{
+    QSettings settings("disorient", "disorient");
+    return settings.value("lastserver").toUrl();
+}
+
+void MainWindow::writeSettings(QUrl server)
+{
+    QSettings settings("disorient", "disorient");
+    settings.setValue("lastserver", server);
 }
 
 void MainWindow::on_pbToLandscape_clicked()
@@ -44,6 +57,7 @@ void MainWindow::on_lineEditWebSocketAddr_returnPressed()
 {
     QUrl url = QUrl(ui->lineEditWebSocketAddr->text());
     iWebSocket->setServerUrl(url);
+    writeSettings(url);
 }
 
 void MainWindow::onStatusReceived(QString status)
@@ -67,7 +81,7 @@ void MainWindow::setupSysTray()
 
     sysTrayIcon = new QSystemTrayIcon(this);
     sysTrayIcon->setContextMenu(trayIconMenu);
-    sysTrayIcon->setIcon(QIcon(":/icon.ico"));
+    sysTrayIcon->setIcon(QIcon(":/icon3.ico"));
     sysTrayIcon->show();
 
     connect(sysTrayIcon, &QSystemTrayIcon::activated, [this](auto reason) {
