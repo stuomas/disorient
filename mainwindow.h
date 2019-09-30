@@ -23,8 +23,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    QUrl readSettings();
-    void writeSettings(QUrl server);
+    QVariant readSettings(QString key);
+    void writeToRegistry(QString key, QVariant value);
 
 private slots:
     void on_pbToLandscape_clicked();
@@ -33,6 +33,7 @@ private slots:
     void on_pbToPortraitFlipped_clicked();
     void on_lineEditWebSocketAddr_returnPressed();
     void onStatusReceived(QString status);
+    void on_checkBoxAutostart_stateChanged(int state);
 
 private:
     Ui::MainWindow *ui;

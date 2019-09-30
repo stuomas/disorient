@@ -13,7 +13,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(scr, &Screen::statusChanged, this, &MainWindow::onStatusReceived);
     connect(iWebSocket, &InputWebSocket::messageToScreen, scr, &Screen::onMessageReceived);
     connect(iWebSocket, &InputWebSocket::sendStatusUpdate, this, &MainWindow::onStatusReceived);
-    ui->lineEditWebSocketAddr->setText(readSettings().toString());
+
+    ui->lineEditWebSocketAddr->setText(readSettings("lastaddress").toString());
+    ui->checkBoxAutostart->setChecked(readSettings("autostart_enabled").toBool());
 }
 
 MainWindow::~MainWindow()
@@ -21,16 +23,16 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-QUrl MainWindow::readSettings()
+QVariant MainWindow::readSettings(QString key)
 {
     QSettings settings("disorient", "disorient");
-    return settings.value("lastserver").toUrl();
+    return settings.value(key);
 }
 
-void MainWindow::writeSettings(QUrl server)
+void MainWindow::writeToRegistry(QString key, QVariant value)
 {
     QSettings settings("disorient", "disorient");
-    settings.setValue("lastserver", server);
+    settings.setValue(key, value);
 }
 
 void MainWindow::on_pbToLandscape_clicked()
@@ -56,14 +58,19 @@ void MainWindow::on_pbToPortraitFlipped_clicked()
 void MainWindow::on_lineEditWebSocketAddr_returnPressed()
 {
     QUrl url = QUrl(ui->lineEditWebSocketAddr->text());
-    iWebSocket->setServerUrl(url);
-    writeSettings(url);
+    if(url.isValid() && url.scheme() == "ws") {
+        iWebSocket->setServerUrl(url);
+        writeToRegistry("lastaddress", url);
+    } else {
+        onStatusReceived("Invalid websocket address");
+    }
 }
 
 void MainWindow::onStatusReceived(QString status)
 {
     bar->showMessage(status);
-    sysTrayIcon->showMessage(QString("Message from server"), status);
+    if(!this->isActiveWindow())
+        sysTrayIcon->showMessage(QString("Message from server"), status);
 }
 
 void MainWindow::setupSysTray()
@@ -104,5 +111,19 @@ void MainWindow::closeEvent(QCloseEvent *event)
     else {
         this->hide();
         event->ignore();
+    }
+}
+
+void MainWindow::on_checkBoxAutostart_stateChanged(int state)
+{
+    QSettings bootSettings("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+    QString path = QCoreApplication::applicationFilePath();
+
+    if(state == Qt::Checked) {
+        bootSettings.setValue("disorient", path);
+        writeToRegistry("autostart_enabled", Qt::Checked);
+    } else {
+        bootSettings.remove("disorient");
+        writeToRegistry("autostart_enabled", Qt::Unchecked);
     }
 }
