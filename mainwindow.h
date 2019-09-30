@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QSettings>
+#include <QDir>
 
 namespace Ui {
 class MainWindow;
