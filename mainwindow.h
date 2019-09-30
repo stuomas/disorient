@@ -3,8 +3,6 @@
 
 #include <QMainWindow>
 #include <QStatusBar>
-#include "screen.h"
-#include "inputwebsocket.h"
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
@@ -12,6 +10,10 @@
 #include <QCloseEvent>
 #include <QSettings>
 #include <QDir>
+#include "screen.h"
+#include "inputwebsocket.h"
+#include "constants.h"
+#include "windows.h"
 
 namespace Ui {
 class MainWindow;
@@ -26,6 +28,8 @@ public:
     ~MainWindow();
     QVariant readSettings(QString key);
     void writeToRegistry(QString key, QVariant value);
+    bool nativeEvent(const QByteArray& eventType, void* message, long* result);
+    void setupSettings();
 
 private slots:
     void on_pbToLandscape_clicked();

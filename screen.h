@@ -1,9 +1,11 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
-#include "windows.h"
 #include <QString>
 #include <QObject>
+#include <QDebug>
+#include <algorithm>
+#include "windows.h"
 
 //Naming assumes landscape-native device (desktop PC)
 enum class Orientation {Landscape, Portrait, LandscapeFlip, PortraitFlip};

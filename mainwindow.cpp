@@ -5,33 +5,37 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
     bar = new QStatusBar(this);
-    bar->setSizeGripEnabled(false);
     bar->setStyleSheet("font-size: 12px");
     ui->verticalLayout->addWidget(bar);
     setupSysTray();
+    setupSettings();
 
     connect(scr, &Screen::statusChanged, this, &MainWindow::onStatusReceived);
     connect(iWebSocket, &InputWebSocket::messageToScreen, scr, &Screen::onMessageReceived);
     connect(iWebSocket, &InputWebSocket::sendStatusUpdate, this, &MainWindow::onStatusReceived);
 
-    ui->lineEditWebSocketAddr->setText(readSettings("lastaddress").toString());
-    ui->checkBoxAutostart->setChecked(readSettings("autostart_enabled").toBool());
+    //TODO: Add error handling
+    RegisterHotKey(HWND(winId()), 101, MOD_CONTROL | MOD_ALT, VK_UP);
+    RegisterHotKey(HWND(winId()), 102, MOD_CONTROL | MOD_ALT, VK_RIGHT);
+    RegisterHotKey(HWND(winId()), 103, MOD_CONTROL | MOD_ALT, VK_DOWN);
+    RegisterHotKey(HWND(winId()), 104, MOD_CONTROL | MOD_ALT, VK_LEFT);
 }
 
 MainWindow::~MainWindow()
 {
+    iWebSocket->closeConnection();
     delete ui;
 }
 
 QVariant MainWindow::readSettings(QString key)
 {
-    QSettings settings("disorient", "disorient");
+    QSettings settings(Names::SettingOrganization, Names::SettingApplication);
     return settings.value(key);
 }
 
 void MainWindow::writeToRegistry(QString key, QVariant value)
 {
-    QSettings settings("disorient", "disorient");
+    QSettings settings(Names::SettingOrganization, Names::SettingApplication);
     settings.setValue(key, value);
 }
 
@@ -58,9 +62,9 @@ void MainWindow::on_pbToPortraitFlipped_clicked()
 void MainWindow::on_lineEditWebSocketAddr_returnPressed()
 {
     QUrl url = QUrl(ui->lineEditWebSocketAddr->text());
-    if(url.isValid() && url.scheme() == "ws") {
-        iWebSocket->setServerUrl(url);
-        writeToRegistry("lastaddress", url);
+    if(iWebSocket->validateUrl(url)) {
+        iWebSocket->connectToServer(url);
+        writeToRegistry(Names::SettingLastAddress, url);
     } else {
         onStatusReceived("Invalid websocket address");
     }
@@ -120,10 +124,47 @@ void MainWindow::on_checkBoxAutostart_stateChanged(int state)
     QString path = QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
 
     if(state == Qt::Checked) {
-        bootSettings.setValue("disorient", path);
-        writeToRegistry("autostart_enabled", Qt::Checked);
+        bootSettings.setValue(Names::SettingApplication, path);
+        writeToRegistry(Names::SettingAutostartEnabled, Qt::Checked);
     } else {
-        bootSettings.remove("disorient");
-        writeToRegistry("autostart_enabled", Qt::Unchecked);
+        bootSettings.remove(Names::SettingApplication);
+        writeToRegistry(Names::SettingAutostartEnabled, Qt::Unchecked);
     }
+}
+
+//Override QWidget::nativeEvent to catch registered global hotkey events
+bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
+{
+    Q_UNUSED(eventType)
+    Q_UNUSED(result)
+
+    MSG* msg = static_cast<MSG*>(message);
+    if (msg->message == WM_HOTKEY) {
+        switch(msg->wParam) {
+        case 101:
+            scr->flip(Orientation::Landscape);
+            break;
+        case 102:
+            scr->flip(Orientation::Portrait);
+            break;
+        case 103:
+            scr->flip(Orientation::LandscapeFlip);
+            break;
+        case 104:
+            scr->flip(Orientation::PortraitFlip);
+            break;
+        }
+        return true;
+    }
+    return false;
+}
+
+void MainWindow::setupSettings()
+{
+    QUrl lastUrl = readSettings(Names::SettingLastAddress).toUrl();
+    if(iWebSocket->validateUrl(lastUrl)) {
+        ui->lineEditWebSocketAddr->setText(lastUrl.toString());
+        iWebSocket->connectToServer(lastUrl);
+    }
+    ui->checkBoxAutostart->setChecked(readSettings(Names::SettingAutostartEnabled).toBool());
 }

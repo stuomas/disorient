@@ -1,6 +1,5 @@
 #include "screen.h"
-#include <QDebug>
-#include <algorithm>
+#include "constants.h"
 
 Screen::Screen()
 {
@@ -83,14 +82,14 @@ void Screen::adjustResolution(Orientation o, unsigned long &w, unsigned long &h)
 void Screen::onMessageReceived(QString msg)
 {
     //Validate text messages from the WebSocket server
-    if(msg == "portrait")
-        flip(Orientation::Portrait);
-    else if(msg == "landscape")
+    if(msg == Names::Orientation0)
         flip(Orientation::Landscape);
-    else if(msg == "portraitflipped")
-        flip(Orientation::PortraitFlip);
-    else if(msg == "landscapeflipped")
+    else if(msg == Names::Orientation90)
+        flip(Orientation::Portrait);
+    else if(msg == Names::Orientation180)
         flip(Orientation::LandscapeFlip);
+    else if(msg == Names::Orientation270)
+        flip(Orientation::PortraitFlip);
     else
         emit statusChanged("Message from server: " + msg);
 }

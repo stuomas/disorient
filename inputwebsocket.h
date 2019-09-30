@@ -9,6 +9,7 @@
 
 #include <QString>
 #include <QtWebSockets/QWebSocket>
+#include <QDebug>
 
 class InputWebSocket : public QObject
 {
@@ -17,7 +18,9 @@ class InputWebSocket : public QObject
 public:
     InputWebSocket();
     ~InputWebSocket();
-    void setServerUrl(const QUrl &addr);
+    void connectToServer(const QUrl &addr);
+    bool validateUrl(QUrl url);
+    void closeConnection();
 signals:
     void closed();
     void messageToScreen(QString msg);

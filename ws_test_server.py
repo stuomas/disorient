@@ -2,6 +2,7 @@
 
 import websockets
 import asyncio
+import sys
 
 async def hello(websocket, path):
     name = await websocket.recv()
@@ -12,7 +13,7 @@ async def hello(websocket, path):
     while True:
         msg = input("New message: ")
         if msg == "q":
-            exit()
+            sys.exit()
         await websocket.send(msg)
         print(f"Sent: {msg}")
 

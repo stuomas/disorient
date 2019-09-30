@@ -1,5 +1,4 @@
 #include "inputwebsocket.h"
-#include <QDebug>
 
 InputWebSocket::InputWebSocket() : wsock(new QWebSocket)
 {
@@ -13,10 +12,21 @@ InputWebSocket::~InputWebSocket()
     wsock->close();
 }
 
-void InputWebSocket::setServerUrl(const QUrl &addr)
+void InputWebSocket::connectToServer(const QUrl &addr)
 {
     serverUrl = addr;
     wsock->open(addr);
+}
+
+bool InputWebSocket::validateUrl(QUrl url)
+{
+    return url.isValid() && url.scheme() == "ws";
+}
+
+void InputWebSocket::closeConnection()
+{
+    wsock->close(QWebSocketProtocol::CloseCodeNormal, "User closed application");
+    qDebug() << "user closed";
 }
 
 void InputWebSocket::onConnected()
