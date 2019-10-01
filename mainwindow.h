@@ -10,6 +10,7 @@
 #include <QCloseEvent>
 #include <QSettings>
 #include <QDir>
+#include <QDateTime>
 #include "screen.h"
 #include "inputwebsocket.h"
 #include "constants.h"
@@ -30,6 +31,8 @@ public:
     void writeToRegistry(QString key, QVariant value);
     bool nativeEvent(const QByteArray& eventType, void* message, long* result);
     void setupSettings();
+    void log(const QString &logtext);
+    QString timestamp();
 
 private slots:
     void on_pbToLandscape_clicked();
@@ -45,7 +48,6 @@ private:
     Screen *scr;
     InputWebSocket *iWebSocket;
     QString statusMsg;
-    QStatusBar *bar;
     QSystemTrayIcon *sysTrayIcon;
     bool closing;
     void setupSysTray();

@@ -1,30 +1,46 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "constants.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), scr(new Screen), iWebSocket(new InputWebSocket)
 {
     ui->setupUi(this);
-    bar = new QStatusBar(this);
-    bar->setStyleSheet("font-size: 12px");
-    ui->verticalLayout->addWidget(bar);
     setupSysTray();
     setupSettings();
+    ui->labelWs->setToolTip(Tooltip::WsHelpIcon);
+    ui->labelCom->setToolTip(Tooltip::ComHelpIcon);
 
     connect(scr, &Screen::statusChanged, this, &MainWindow::onStatusReceived);
+    connect(scr, &Screen::messageToLog, this, &MainWindow::log);
     connect(iWebSocket, &InputWebSocket::messageToScreen, scr, &Screen::onMessageReceived);
-    connect(iWebSocket, &InputWebSocket::sendStatusUpdate, this, &MainWindow::onStatusReceived);
+    connect(iWebSocket, &InputWebSocket::statusToScreen, this, &MainWindow::onStatusReceived);
 
-    //TODO: Add error handling
-    RegisterHotKey(HWND(winId()), 101, MOD_CONTROL | MOD_ALT, VK_UP);
-    RegisterHotKey(HWND(winId()), 102, MOD_CONTROL | MOD_ALT, VK_RIGHT);
-    RegisterHotKey(HWND(winId()), 103, MOD_CONTROL | MOD_ALT, VK_DOWN);
-    RegisterHotKey(HWND(winId()), 104, MOD_CONTROL | MOD_ALT, VK_LEFT);
+    log("Welcome to disorient");
+
+    if(!RegisterHotKey(HWND(winId()), 101, MOD_CONTROL | MOD_ALT, VK_UP) ||
+       !RegisterHotKey(HWND(winId()), 102, MOD_CONTROL | MOD_ALT, VK_RIGHT) ||
+       !RegisterHotKey(HWND(winId()), 103, MOD_CONTROL | MOD_ALT, VK_DOWN) ||
+       !RegisterHotKey(HWND(winId()), 104, MOD_CONTROL | MOD_ALT, VK_LEFT)) {
+
+        log("Some global hotkeys could not be registered.");
+    }
 }
 
 MainWindow::~MainWindow()
 {
     iWebSocket->closeConnection();
     delete ui;
+}
+
+QString MainWindow::timestamp()
+{
+    return QDateTime::currentDateTime().toString("HH:mm:ss");
+}
+
+void MainWindow::log(const QString &logtext)
+{
+    ui->textLog->append(QString("<b>[%1]</b> %2").arg(timestamp()).arg(logtext));
+    ui->textLog->repaint();
 }
 
 QVariant MainWindow::readSettings(QString key)
@@ -72,9 +88,9 @@ void MainWindow::on_lineEditWebSocketAddr_returnPressed()
 
 void MainWindow::onStatusReceived(QString status)
 {
-    bar->showMessage(status);
-    if(!this->isActiveWindow())
-        sysTrayIcon->showMessage(QString("Message from server"), status);
+    log(status);
+    sysTrayIcon->showMessage("Status update", status);
+    sysTrayIcon->setToolTip(QString("Disorient\n%1").arg(status));
 }
 
 void MainWindow::setupSysTray()
@@ -92,7 +108,7 @@ void MainWindow::setupSysTray()
 
     sysTrayIcon = new QSystemTrayIcon(this);
     sysTrayIcon->setContextMenu(trayIconMenu);
-    sysTrayIcon->setIcon(QIcon(":/icon3.ico"));
+    sysTrayIcon->setIcon(QIcon(":/icon.ico"));
     sysTrayIcon->show();
 
     connect(sysTrayIcon, &QSystemTrayIcon::activated, [this](auto reason) {
@@ -115,6 +131,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     else {
         this->hide();
         event->ignore();
+        sysTrayIcon->showMessage("Still here!", "Select Exit from the right-click menu to exit.");
     }
 }
 

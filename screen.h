@@ -20,10 +20,13 @@ public:
     void adjustResolution(Orientation o, unsigned long &w, unsigned long &h);
 signals:
     void statusChanged(QString status);
+    void messageToLog(QString msg);
+
 public slots:
     void onMessageReceived(QString msg);
 private:
     DEVMODE dm;
+    QString lastActionStatus;
 };
 
 #endif // SCREEN_H

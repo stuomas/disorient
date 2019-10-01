@@ -22,12 +22,12 @@ public:
     bool validateUrl(QUrl url);
     void closeConnection();
 signals:
-    void closed();
     void messageToScreen(QString msg);
-    void sendStatusUpdate(QString msg);
+    void statusToScreen(QString msg);
 
 private slots:
     void onConnected();
+    void onDisconnected();
     void onTextMessageReceived(QString msg);
 
 private:

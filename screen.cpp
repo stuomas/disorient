@@ -36,28 +36,28 @@ void Screen::flip(Orientation o)
         long status = ChangeDisplaySettings(&dm, 0);
         switch(status) {
         case DISP_CHANGE_SUCCESSFUL:
-            emit statusChanged("DISP_CHANGE_SUCCESSFUL");
+            lastActionStatus = "DISP_CHANGE_SUCCESSFUL";
             break;
         case DISP_CHANGE_BADDUALVIEW:
-            emit statusChanged("DISP_CHANGE_BADDUALVIEW");
+            lastActionStatus = "DISP_CHANGE_BADDUALVIEW";
             break;
         case DISP_CHANGE_BADFLAGS:
-            emit statusChanged("DISP_CHANGE_BADFLAGS");
+            lastActionStatus = "DISP_CHANGE_BADFLAGS";
             break;
         case DISP_CHANGE_BADMODE:
-            emit statusChanged("DISP_CHANGE_BADMODE");
+            lastActionStatus = "DISP_CHANGE_BADMODE";
             break;
         case DISP_CHANGE_BADPARAM:
-            emit statusChanged("DISP_CHANGE_BADPARAM");
+            lastActionStatus = "DISP_CHANGE_BADPARAM";
             break;
         case DISP_CHANGE_FAILED:
-            emit statusChanged("DISP_CHANGE_FAILED");
+            lastActionStatus = "DISP_CHANGE_FAILED";
             break;
         case DISP_CHANGE_NOTUPDATED:
-            emit statusChanged("DISP_CHANGE_NOTUPDATED");
+            lastActionStatus = "DISP_CHANGE_NOTUPDATED";
             break;
         case DISP_CHANGE_RESTART:
-            emit statusChanged("DISP_CHANGE_RESTART");
+            lastActionStatus = "DISP_CHANGE_RESTART";
             break;
         }
     }
@@ -82,14 +82,18 @@ void Screen::adjustResolution(Orientation o, unsigned long &w, unsigned long &h)
 void Screen::onMessageReceived(QString msg)
 {
     //Validate text messages from the WebSocket server
-    if(msg == Names::Orientation0)
+    if(msg == Names::Orientation0) {
         flip(Orientation::Landscape);
-    else if(msg == Names::Orientation90)
+        emit messageToLog(QString("→ %1 (%2)").arg(Names::Orientation0).arg(lastActionStatus));
+    } else if(msg == Names::Orientation90) {
         flip(Orientation::Portrait);
-    else if(msg == Names::Orientation180)
+        emit messageToLog(QString("→ %1 (%2)").arg(Names::Orientation90).arg(lastActionStatus));
+    } else if(msg == Names::Orientation180) {
         flip(Orientation::LandscapeFlip);
-    else if(msg == Names::Orientation270)
+        emit messageToLog(QString("→ %1 (%2)").arg(Names::Orientation180).arg(lastActionStatus));
+    } else if(msg == Names::Orientation270) {
         flip(Orientation::PortraitFlip);
-    else
-        emit statusChanged("Message from server: " + msg);
+        emit messageToLog(QString("→ %1 (%2)").arg(Names::Orientation270).arg(lastActionStatus));
+    } else
+        emit messageToLog("Unrecognized message from server: " + msg);
 }
