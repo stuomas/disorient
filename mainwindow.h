@@ -32,6 +32,7 @@ public:
     bool nativeEvent(const QByteArray& eventType, void* message, long* result);
     void setupSettings();
     void log(const QString &logtext);
+    void setupCombobox(QVector<DISPLAY_DEVICE> displays);
     QString timestamp();
 
 private slots:

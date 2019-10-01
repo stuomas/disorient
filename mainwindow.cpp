@@ -4,16 +4,17 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), scr(new Screen), iWebSocket(new InputWebSocket)
 {
+    connect(scr, &Screen::statusChanged, this, &MainWindow::onStatusReceived);
+    connect(scr, &Screen::messageToLog, this, &MainWindow::log);
+    connect(iWebSocket, &InputWebSocket::messageToScreen, scr, &Screen::onMessageReceived);
+    connect(iWebSocket, &InputWebSocket::statusToScreen, this, &MainWindow::onStatusReceived);
+
     ui->setupUi(this);
     setupSysTray();
     setupSettings();
     ui->labelWs->setToolTip(Tooltip::WsHelpIcon);
     ui->labelCom->setToolTip(Tooltip::ComHelpIcon);
-
-    connect(scr, &Screen::statusChanged, this, &MainWindow::onStatusReceived);
-    connect(scr, &Screen::messageToLog, this, &MainWindow::log);
-    connect(iWebSocket, &InputWebSocket::messageToScreen, scr, &Screen::onMessageReceived);
-    connect(iWebSocket, &InputWebSocket::statusToScreen, this, &MainWindow::onStatusReceived);
+    setupCombobox(scr->getDisplays());
 
     log("Welcome to disorient");
 
@@ -91,6 +92,13 @@ void MainWindow::onStatusReceived(QString status)
     log(status);
     sysTrayIcon->showMessage("Status update", status);
     sysTrayIcon->setToolTip(QString("Disorient\n%1").arg(status));
+}
+
+void MainWindow::setupCombobox(QVector<DISPLAY_DEVICE> displays)
+{
+    for(auto i : displays) {
+        ui->comboBoxDisplayList->addItem(QString::fromWCharArray(i.DeviceName));
+    }
 }
 
 void MainWindow::setupSysTray()

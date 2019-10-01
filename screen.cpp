@@ -3,12 +3,36 @@
 
 Screen::Screen()
 {
-    dm.dmSize = sizeof(DEVMODE);
+    //The primary display is used by default
+    dm.dmSize = sizeof(dm);
     dm.dmDriverExtra = 0;
     EnumDisplaySettings(nullptr, ENUM_CURRENT_SETTINGS, &dm);
+    enumerateDevices();
     //TODO: support multiple displays
     //This parameter is either NULL or a DISPLAY_DEVICE.DeviceName returned from EnumDisplayDevices.
     //A NULL value specifies the current display device on the computer on which the calling thread is running.
+}
+
+void Screen::enumerateDevices()
+{
+    DISPLAY_DEVICE dev;
+    dev.cb = sizeof(dev);
+    dev.StateFlags = DISPLAY_DEVICE_ACTIVE;
+    DWORD iDevNum = 0;
+    while(EnumDisplayDevices(nullptr, iDevNum, &dev, 0)) {
+        WCHAR *n = dev.DeviceName;
+        EnumDisplayDevices(n, 0, &dev, EDD_GET_DEVICE_INTERFACE_NAME); //second call to get monitor name, not working?
+        displays.push_back(dev);
+        qDebug() << QString::fromWCharArray(displays[iDevNum].DeviceString);
+        ++iDevNum;
+    }
+}
+
+void Screen::enumerateSettings(int chosenDisplay)
+{
+    dm.dmSize = sizeof(DEVMODE);
+    dm.dmDriverExtra = 0;
+    EnumDisplaySettings(displays[chosenDisplay].DeviceName, ENUM_CURRENT_SETTINGS, &dm);
 }
 
 void Screen::flip(Orientation o)
