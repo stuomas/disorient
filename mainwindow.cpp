@@ -11,10 +11,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->setupUi(this);
     setupSysTray();
-    setupSettings();
+    setupCombobox(scr->getDisplays());
+    loadSettingsFromRegistry();
     ui->labelWs->setToolTip(Tooltip::WsHelpIcon);
     ui->labelCom->setToolTip(Tooltip::ComHelpIcon);
-    setupCombobox(scr->getDisplays());
 
     log("Welcome to disorient");
 
@@ -96,8 +96,10 @@ void MainWindow::onStatusReceived(QString status)
 
 void MainWindow::setupCombobox(QVector<DISPLAY_DEVICE> displays)
 {
+    int n = 1;
     for(auto i : displays) {
-        ui->comboBoxDisplayList->addItem(QString::fromWCharArray(i.DeviceName));
+        ui->comboBoxDisplayList->addItem(QString::number(n) + QString(". ") + QString::fromWCharArray(i.DeviceString));
+        ++n;
     }
 }
 
@@ -184,7 +186,7 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* r
     return false;
 }
 
-void MainWindow::setupSettings()
+void MainWindow::loadSettingsFromRegistry()
 {
     QUrl lastUrl = readSettings(Names::SettingLastAddress).toUrl();
     if(iWebSocket->validateUrl(lastUrl)) {
@@ -192,4 +194,13 @@ void MainWindow::setupSettings()
         iWebSocket->connectToServer(lastUrl);
     }
     ui->checkBoxAutostart->setChecked(readSettings(Names::SettingAutostartEnabled).toBool());
+    int index = readSettings(Names::SettingSelectedMonitor).toInt();
+    ui->comboBoxDisplayList->setCurrentIndex(index);
+    scr->setChosenDisplay(index);
+}
+
+void MainWindow::on_comboBoxDisplayList_activated(int index)
+{
+    scr->enumerateSettings(index);
+    writeToRegistry(Names::SettingSelectedMonitor, index);
 }

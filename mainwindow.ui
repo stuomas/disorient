@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>287</width>
-    <height>293</height>
+    <width>314</width>
+    <height>367</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -73,7 +73,7 @@
            <number>0</number>
           </property>
           <property name="topMargin">
-           <number>2</number>
+           <number>0</number>
           </property>
           <property name="rightMargin">
            <number>0</number>
@@ -91,7 +91,7 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>110</width>
+              <width>120</width>
               <height>0</height>
              </size>
             </property>
@@ -112,6 +112,12 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
             </property>
             <property name="font">
              <font>
@@ -134,7 +140,7 @@
            <number>0</number>
           </property>
           <property name="topMargin">
-           <number>2</number>
+           <number>0</number>
           </property>
           <property name="rightMargin">
            <number>0</number>
@@ -152,7 +158,7 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>110</width>
+              <width>120</width>
               <height>0</height>
              </size>
             </property>
@@ -173,6 +179,12 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
             </property>
             <property name="font">
              <font>
@@ -204,7 +216,7 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>110</width>
+              <width>120</width>
               <height>0</height>
              </size>
             </property>
@@ -221,6 +233,12 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
            </widget>
           </item>
          </layout>
@@ -234,6 +252,12 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
         </property>
         <property name="font">
          <font>

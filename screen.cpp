@@ -8,31 +8,32 @@ Screen::Screen()
     dm.dmDriverExtra = 0;
     EnumDisplaySettings(nullptr, ENUM_CURRENT_SETTINGS, &dm);
     enumerateDevices();
-    //TODO: support multiple displays
-    //This parameter is either NULL or a DISPLAY_DEVICE.DeviceName returned from EnumDisplayDevices.
-    //A NULL value specifies the current display device on the computer on which the calling thread is running.
+    chosenDisplay = allDisplayAdapters[0];
 }
 
 void Screen::enumerateDevices()
 {
-    DISPLAY_DEVICE dev;
-    dev.cb = sizeof(dev);
-    dev.StateFlags = DISPLAY_DEVICE_ACTIVE;
-    DWORD iDevNum = 0;
-    while(EnumDisplayDevices(nullptr, iDevNum, &dev, 0)) {
-        WCHAR *n = dev.DeviceName;
-        EnumDisplayDevices(n, 0, &dev, EDD_GET_DEVICE_INTERFACE_NAME); //second call to get monitor name, not working?
-        displays.push_back(dev);
-        qDebug() << QString::fromWCharArray(displays[iDevNum].DeviceString);
-        ++iDevNum;
+    DISPLAY_DEVICE ddev;
+    ddev.cb = sizeof(ddev);
+    ddev.StateFlags = DISPLAY_DEVICE_ACTIVE;
+    DWORD devNum = 0;
+
+    while(EnumDisplayDevices(nullptr, devNum, &ddev, EDD_GET_DEVICE_INTERFACE_NAME)) {
+        DISPLAY_DEVICE dmon;
+        dmon.cb = sizeof(dmon);
+        allDisplayAdapters.push_back(ddev);
+        if(EnumDisplayDevices(ddev.DeviceName, 0, &dmon, 0)) { //Second call needed to get monitor name
+            allDisplayMonitors.push_back(dmon);
+        }
+        ++devNum;
     }
 }
 
-void Screen::enumerateSettings(int chosenDisplay)
+void Screen::enumerateSettings(int displayNum)
 {
-    dm.dmSize = sizeof(DEVMODE);
-    dm.dmDriverExtra = 0;
-    EnumDisplaySettings(displays[chosenDisplay].DeviceName, ENUM_CURRENT_SETTINGS, &dm);
+    if(EnumDisplaySettings(allDisplayAdapters[displayNum].DeviceName, ENUM_CURRENT_SETTINGS, &dm)) {
+        chosenDisplay = allDisplayAdapters[displayNum];
+    }
 }
 
 void Screen::flip(Orientation o)
@@ -57,7 +58,7 @@ void Screen::flip(Orientation o)
     }
 
     if (dm.dmFields | DM_DISPLAYORIENTATION) {
-        long status = ChangeDisplaySettings(&dm, 0);
+        long status = ChangeDisplaySettingsEx(chosenDisplay.DeviceName, &dm, nullptr, 0, nullptr);
         switch(status) {
         case DISP_CHANGE_SUCCESSFUL:
             lastActionStatus = "DISP_CHANGE_SUCCESSFUL";

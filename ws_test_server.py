@@ -1,4 +1,5 @@
-#Barebones WebSocket server implementation for testing purposes
+#Barebones WebSocket server implementation for testing purposes.
+#Enter ws://localhost:8765 as websocket server address in Disorient.
 
 import websockets
 import asyncio
@@ -21,4 +22,3 @@ start_server = websockets.serve(hello, "localhost", 8765)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
-

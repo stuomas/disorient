@@ -20,8 +20,9 @@ public:
     void flip(Orientation o);
     void adjustResolution(Orientation o, unsigned long &w, unsigned long &h);
     void enumerateDevices();
-    void enumerateSettings(int chosenDisplay);
-    QVector<DISPLAY_DEVICE> getDisplays() {return displays;}
+    void enumerateSettings(int displayNum);
+    QVector<DISPLAY_DEVICE> getDisplays() {return allDisplayMonitors;}
+    void setChosenDisplay(int displayNum) {chosenDisplay = allDisplayAdapters[displayNum];}
 
 signals:
     void statusChanged(QString status);
@@ -33,7 +34,11 @@ public slots:
 private:
     DEVMODE dm;
     QString lastActionStatus;
-    QVector<DISPLAY_DEVICE> displays;
+
+    //Some weird WinAPI quirks, maybe there is a better way
+    QVector<DISPLAY_DEVICE> allDisplayMonitors;
+    QVector<DISPLAY_DEVICE> allDisplayAdapters;
+    DISPLAY_DEVICE chosenDisplay;
 };
 
 #endif // SCREEN_H

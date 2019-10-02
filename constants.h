@@ -7,8 +7,10 @@ namespace Names {
 //Names used in Windows registry
 const QString SettingOrganization = "disorient";
 const QString SettingApplication = "disorient";
-const QString SettingLastAddress = "lastaddress";
+const QString SettingLastAddress = "last_address";
 const QString SettingAutostartEnabled = "autostart_enabled";
+const QString SettingSelectedMonitor = "selected_monitor";
+const QString SettingSelectedComPort = "selected_com";
 const QString Orientation0 = "landscape";
 const QString Orientation90 = "portrait";
 const QString Orientation180 = "flandscape";
