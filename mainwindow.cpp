@@ -104,9 +104,9 @@ void MainWindow::setupTooltips()
 void MainWindow::setupHotkeys()
 {
     if(!RegisterHotKey(HWND(winId()), 101, MOD_CONTROL | MOD_ALT, VK_UP) ||
-       !RegisterHotKey(HWND(winId()), 102, MOD_CONTROL | MOD_ALT, VK_RIGHT) ||
+       !RegisterHotKey(HWND(winId()), 102, MOD_CONTROL | MOD_ALT, VK_LEFT) ||
        !RegisterHotKey(HWND(winId()), 103, MOD_CONTROL | MOD_ALT, VK_DOWN) ||
-       !RegisterHotKey(HWND(winId()), 104, MOD_CONTROL | MOD_ALT, VK_LEFT)) {
+       !RegisterHotKey(HWND(winId()), 104, MOD_CONTROL | MOD_ALT, VK_RIGHT)) {
 
         log("Some global hotkeys could not be registered.");
     }

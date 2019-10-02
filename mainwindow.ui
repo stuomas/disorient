@@ -339,7 +339,7 @@
             </property>
             <property name="text">
              <string>Portrait
-(CTRL + ALT + →)</string>
+(CTRL + ALT + ←)</string>
             </property>
            </widget>
           </item>
@@ -352,7 +352,7 @@
             </property>
             <property name="text">
              <string>Portrait flipped
-(CTRL + ALT + ←)</string>
+(CTRL + ALT + →)</string>
             </property>
            </widget>
           </item>
