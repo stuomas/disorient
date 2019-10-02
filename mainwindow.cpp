@@ -12,19 +12,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     setupSysTray();
     setupCombobox(scr->getDisplays());
+    setupTooltips();
+    setupHotkeys();
     loadSettingsFromRegistry();
-    ui->labelWs->setToolTip(Tooltip::WsHelpIcon);
-    ui->labelCom->setToolTip(Tooltip::ComHelpIcon);
 
-    log("Welcome to disorient");
-
-    if(!RegisterHotKey(HWND(winId()), 101, MOD_CONTROL | MOD_ALT, VK_UP) ||
-       !RegisterHotKey(HWND(winId()), 102, MOD_CONTROL | MOD_ALT, VK_RIGHT) ||
-       !RegisterHotKey(HWND(winId()), 103, MOD_CONTROL | MOD_ALT, VK_DOWN) ||
-       !RegisterHotKey(HWND(winId()), 104, MOD_CONTROL | MOD_ALT, VK_LEFT)) {
-
-        log("Some global hotkeys could not be registered.");
-    }
+    log(QString("Welcome to %1!").arg(Names::SettingApplication));
 }
 
 MainWindow::~MainWindow()
@@ -91,7 +83,7 @@ void MainWindow::onStatusReceived(QString status)
 {
     log(status);
     sysTrayIcon->showMessage("Status update", status);
-    sysTrayIcon->setToolTip(QString("Disorient\n%1").arg(status));
+    sysTrayIcon->setToolTip(QString("%1\n%2").arg(Names::SettingApplication).arg(status));
 }
 
 void MainWindow::setupCombobox(QVector<DISPLAY_DEVICE> displays)
@@ -100,6 +92,23 @@ void MainWindow::setupCombobox(QVector<DISPLAY_DEVICE> displays)
     for(auto i : displays) {
         ui->comboBoxDisplayList->addItem(QString::number(n) + QString(". ") + QString::fromWCharArray(i.DeviceString));
         ++n;
+    }
+}
+
+void MainWindow::setupTooltips()
+{
+    ui->lineEditWebSocketAddr->setToolTip(Tooltip::WsHelpIcon);
+    ui->comboBoxCOM->setToolTip(Tooltip::ComHelpIcon);
+}
+
+void MainWindow::setupHotkeys()
+{
+    if(!RegisterHotKey(HWND(winId()), 101, MOD_CONTROL | MOD_ALT, VK_UP) ||
+       !RegisterHotKey(HWND(winId()), 102, MOD_CONTROL | MOD_ALT, VK_RIGHT) ||
+       !RegisterHotKey(HWND(winId()), 103, MOD_CONTROL | MOD_ALT, VK_DOWN) ||
+       !RegisterHotKey(HWND(winId()), 104, MOD_CONTROL | MOD_ALT, VK_LEFT)) {
+
+        log("Some global hotkeys could not be registered.");
     }
 }
 

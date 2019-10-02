@@ -5,8 +5,8 @@
 
 namespace Names {
 //Names used in Windows registry
-const QString SettingOrganization = "disorient";
-const QString SettingApplication = "disorient";
+const QString SettingOrganization = "Disorient";
+const QString SettingApplication = "Disorient";
 const QString SettingLastAddress = "last_address";
 const QString SettingAutostartEnabled = "autostart_enabled";
 const QString SettingSelectedMonitor = "selected_monitor";
@@ -21,7 +21,7 @@ namespace Tooltip {
 const QString WsHelpIcon =
         QString("The address of the WebSocket server you "
                 "are running somewhere and from where you "
-                "want to send commands to disorient. Send commands "
+                "want to send commands. Send commands "
                 "as text frames. Expected text frames are: \n\n"
                 "%1\n%2\n%3\n%4\n")
                 .arg(Names::Orientation0)

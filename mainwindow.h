@@ -33,6 +33,8 @@ public:
     void loadSettingsFromRegistry();
     void log(const QString &logtext);
     void setupCombobox(QVector<DISPLAY_DEVICE> displays);
+    void setupTooltips();
+    void setupHotkeys();
     QString timestamp();
 
 private slots:

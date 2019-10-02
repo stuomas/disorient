@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>314</width>
-    <height>367</height>
+    <width>333</width>
+    <height>385</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -265,7 +265,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Start automatically when Windows starts </string>
+         <string>Start automatically on Windows startup</string>
         </property>
        </widget>
       </item>
