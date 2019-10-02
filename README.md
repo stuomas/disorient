@@ -2,7 +2,7 @@
 Not all monitors are born equally. If yours does not come with some sort of "auto pivot" functionality, you can build your own position sensor, attach it to the back of the monitor, and feed its output to Disorient.
 
 ### Installation
-Only Windows is supported at the moment. You can complile the sources yourself using QtCreator, or download the release binary.
+Only Windows is supported at the moment. You can complile the sources yourself using QtCreator, or download the release binary. No installation required.
 
 ### Usage
 Currently Disorient accepts external inputs only from a WebSocket server. It also allows changing the display orientation using global hotkeys (CTRL + ALT + ↑/→/↓/←) even without Intel graphics. 
