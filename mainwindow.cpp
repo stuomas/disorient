@@ -155,7 +155,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
     else {
         this->hide();
         event->ignore();
-        sysTrayIcon->showMessage("Still here!", "Select Exit from the right-click menu to exit.");
+        if(firstHide) {
+            firstHide = false;
+            sysTrayIcon->showMessage("Still here!", "Select Exit from the right-click menu to exit.");
+        }
     }
 }
 

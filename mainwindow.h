@@ -56,6 +56,7 @@ private:
     QSystemTrayIcon *sysTrayIcon;
     bool closing;
     bool firstStart;
+    bool firstHide = true;
     void setupSysTray();
 
 protected:
