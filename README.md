@@ -1,4 +1,4 @@
-<h1><img align="left" src="https://github.com/stuomas/disorient/blob/master/disorient.png" /></h1>
+<h1><img align="left" src="https://github.com/stuomas/disorient/blob/master/disorient.png" />&#8291;</h1>
 
 Not all monitors are born equally. If yours does not come with some sort of "auto pivot" functionality, you can build your own position sensor, attach it to the back of the monitor, and feed its output to Disorient.
 
