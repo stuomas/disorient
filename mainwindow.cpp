@@ -3,7 +3,7 @@
 #include "constants.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), scr(new Screen), iWebSocket(new InputWebSocket)
-{
+{  
     connect(scr, &Screen::statusChanged, this, &MainWindow::onStatusReceived);
     connect(scr, &Screen::messageToLog, this, &MainWindow::log);
     connect(iWebSocket, &InputWebSocket::messageToScreen, scr, &Screen::onMessageReceived);
@@ -17,6 +17,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     loadSettingsFromRegistry();
 
     log(QString("Welcome to %1!").arg(Names::SettingApplication));
+
+    if(firstStart) {
+        show(); //start minimized to system tray after first start
+        writeToRegistry(Names::SettingFirstStart, false);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -39,7 +44,7 @@ void MainWindow::log(const QString &logtext)
 QVariant MainWindow::readSettings(QString key)
 {
     QSettings settings(Names::SettingOrganization, Names::SettingApplication);
-    return settings.value(key);
+    return settings.value(key, -1); //If setting doesn't exist, return -1
 }
 
 void MainWindow::writeToRegistry(QString key, QVariant value)
@@ -197,15 +202,22 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* r
 
 void MainWindow::loadSettingsFromRegistry()
 {
+    //Setting for last known WebSocket address
     QUrl lastUrl = readSettings(Names::SettingLastAddress).toUrl();
     if(iWebSocket->validateUrl(lastUrl)) {
         ui->lineEditWebSocketAddr->setText(lastUrl.toString());
         iWebSocket->connectToServer(lastUrl);
     }
+    //Setting for automatic startup
     ui->checkBoxAutostart->setChecked(readSettings(Names::SettingAutostartEnabled).toBool());
+
+    //Setting for last selected display
     int index = readSettings(Names::SettingSelectedMonitor).toInt();
     ui->comboBoxDisplayList->setCurrentIndex(index);
     scr->setChosenDisplay(index);
+
+    //Setting for first start flag
+    firstStart = readSettings(Names::SettingFirstStart).toBool();
 }
 
 void MainWindow::on_comboBoxDisplayList_activated(int index)

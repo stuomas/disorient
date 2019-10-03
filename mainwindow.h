@@ -29,8 +29,8 @@ public:
     ~MainWindow();
     QVariant readSettings(QString key);
     void writeToRegistry(QString key, QVariant value);
-    bool nativeEvent(const QByteArray& eventType, void* message, long* result);
     void loadSettingsFromRegistry();
+    bool nativeEvent(const QByteArray& eventType, void* message, long* result);
     void log(const QString &logtext);
     void setupCombobox(QVector<DISPLAY_DEVICE> displays);
     void setupTooltips();
@@ -55,6 +55,7 @@ private:
     QString statusMsg;
     QSystemTrayIcon *sysTrayIcon;
     bool closing;
+    bool firstStart;
     void setupSysTray();
 
 protected:
