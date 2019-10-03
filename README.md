@@ -1,4 +1,4 @@
-<img align="left" src="https://github.com/stuomas/disorient/blob/master/disorient.png" width="300"/>
+<img align="left" src="https://github.com/stuomas/disorient/blob/master/disorient.png" width="200"/>
 <h1>&#8291;</h1>
 Not all monitors are born equally. If yours does not come with some sort of "auto pivot" functionality, you can build your own position sensor, attach it to the back of the monitor, and feed its output to Disorient.
 
@@ -8,7 +8,7 @@ Only Windows is supported at the moment. You can compile the sources yourself us
 ### Usage
 Currently Disorient accepts external inputs only from a WebSocket server. It also allows changing the display orientation using global hotkeys (CTRL + ALT + ↑/→/↓/←) even without Intel graphics. 
 
-Set the WebSocket server address to its corresponding field. The server should send commands as text frames. Disorient expects the following text frames:
+Disorient acts as a WebSocket client. Set the WebSocket server address in the GUI. The server should send commands as text frames. The following text frames are expected, others are ignored:
 
 `landscape` for default landscape view
 
