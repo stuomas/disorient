@@ -1,0 +1,27 @@
+QTabBar::tab {
+    height: 30px;
+    border: 1px solid #ccc;
+    border-left: none;
+    padding: 0 35px 0 35px;
+}
+
+QTabWidget::pane { /* The tab widget frame */
+    border: none;
+}
+
+QTabWidget::tab-bar {
+    min-width: 2000;
+}
+
+QTabBar::tab:selected {
+    background-color: #f0f0f0;
+    border-bottom: none;
+}
+
+QTabBar::tab:!selected {
+    background-color: #ddd;
+}
+
+QGroupBox {
+    color: #aaa;
+}

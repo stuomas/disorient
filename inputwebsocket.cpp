@@ -1,43 +1,57 @@
 #include "inputwebsocket.h"
 
-InputWebSocket::InputWebSocket() : wsock(new QWebSocket)
+InputWebSocket::InputWebSocket() : m_wsock(new QWebSocket)
 {
-    connect(wsock, &QWebSocket::connected, this, &InputWebSocket::onConnected);
-    connect(wsock, &QWebSocket::disconnected, this, &InputWebSocket::onDisconnected);
-    connect(wsock, &QWebSocket::textMessageReceived, this, &InputWebSocket::onTextMessageReceived);
+    connect(m_wsock, &QWebSocket::connected, this, &InputWebSocket::onConnected);
+    connect(m_wsock, &QWebSocket::disconnected, this, &InputWebSocket::onDisconnected);
+    connect(m_wsock, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), [=](QAbstractSocket::SocketError error) {
+        emit statusToLog(m_wsock->errorString());
+    });
+
+    //Does not work with static linking yet...
+    //QSslConfiguration sslConfiguration = m_wsock->sslConfiguration();
+    //sslConfiguration.setPeerVerifyMode(QSslSocket::VerifyPeer);
+    //m_wsock->setSslConfiguration(sslConfiguration);
 }
 
 InputWebSocket::~InputWebSocket()
 {
-    wsock->close();
+    m_wsock->close();
 }
 
 void InputWebSocket::connectToServer(const QUrl &addr)
 {
-    serverUrl = addr;
-    wsock->open(addr);
+    if(m_wsock->state() == QAbstractSocket::ConnectedState && addr == m_serverUrl) return;
+
+    if(!addr.isEmpty() && validateUrl(addr)) {
+        m_serverUrl = addr;
+        m_wsock->open(m_serverUrl);
+    } else if(!validateUrl(addr)) {
+        emit statusToLog("Invalid WebSocket address!");
+    }
 }
 
 bool InputWebSocket::validateUrl(QUrl url)
 {
-    return url.isValid() && url.scheme() == "ws";
+    return url.isEmpty() || (url.isValid() && (url.scheme() == "ws" || url.scheme() == "wss"));
 }
 
 void InputWebSocket::closeConnection()
 {
-    wsock->close(QWebSocketProtocol::CloseCodeNormal, "User closed application");
+    m_wsock->close(QWebSocketProtocol::CloseCodeNormal, "User closed application");
 }
 
 void InputWebSocket::onConnected()
 { 
-    wsock->sendTextMessage(QStringLiteral("Hello, server!"));
-    emit statusToScreen("Connected to WebSocket server!");
+    connect(m_wsock, &QWebSocket::textMessageReceived, this, &InputWebSocket::onTextMessageReceived);
+    m_wsock->sendTextMessage(QStringLiteral("Hello, server!"));
+    emit statusToLog("<font color='green'>Connected to WebSocket server!</font>");
 }
 
 void InputWebSocket::onDisconnected()
 {
-    wsock->sendTextMessage(QStringLiteral("Client exited"));
-    emit statusToScreen("Disconnected from WebSocket server.");
+    m_wsock->sendTextMessage(QStringLiteral("Client exited"));
+    emit statusToLog("<font color='red'>Disconnected from WebSocket server.</font>");
 }
 
 void InputWebSocket::onTextMessageReceived(QString msg)

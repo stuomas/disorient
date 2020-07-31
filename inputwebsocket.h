@@ -9,7 +9,6 @@
 
 #include <QString>
 #include <QtWebSockets/QWebSocket>
-#include <QDebug>
 
 class InputWebSocket : public QObject
 {
@@ -23,7 +22,7 @@ public:
     void closeConnection();
 signals:
     void messageToScreen(QString msg);
-    void statusToScreen(QString msg);
+    void statusToLog(QString msg);
 
 private slots:
     void onConnected();
@@ -31,8 +30,8 @@ private slots:
     void onTextMessageReceived(QString msg);
 
 private:
-    QWebSocket *wsock;
-    QUrl serverUrl;
+    QWebSocket *m_wsock;
+    QUrl m_serverUrl;
 };
 
 #endif // INPUTWEBSOCKET_H

@@ -1,6 +1,12 @@
 <RCC>
     <qresource prefix="/">
+        <file>styles.qss</file>
+        <file>icons/disorient.png</file>
+        <file>icons/help.png</file>
+        <file>icons/refresh.png</file>
+        <file>icons/save.png</file>
+        <file>icons/settings.png</file>
+        <file>icons/status.png</file>
         <file>icon.ico</file>
-        <file>help.png</file>
     </qresource>
 </RCC>
