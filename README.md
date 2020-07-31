@@ -1,5 +1,6 @@
 <img src="https://github.com/stuomas/disorient/blob/master/disorient.png" width=250>
 
+
 Disorient is an application that integrates your Windows PCs to your IoT fleet. It allows you to control various things over MQTT or a WebSocket. It is meant to coexist with home automation software like Home-Assistant to automatically perform tasks when a specific activity happens.
 
 Some example use cases include
@@ -58,7 +59,7 @@ Checking *Attempt to execute unrecognized payloads in PowerShell* will blindly t
 
 The current state of the application is "it works on my machine". If you have bugs to report or features to request, please do so.
 
-For developing and building from sources, I recommend setting up Qt Creator, static build of Qt 5.15.0, and 64-bit MSVC 2019 compiler. Happy to give more details if you face troubles.
+For developing and building from sources, I recommend setting up Qt Creator, static build of Qt 5.15.0, and 64-bit MSVC 2019 compiler. You also need to add a static build of QtMqtt, since it is not included by default. Happy to give more details if you face troubles.
 
 
 <a align="center" href="https://www.buymeacoffee.com/stuomas"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" width=170></a>

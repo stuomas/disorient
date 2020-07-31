@@ -141,7 +141,7 @@ void MainWindow::setupSysTray()
 
     m_sysTrayIcon = new QSystemTrayIcon(this);
     m_sysTrayIcon->setContextMenu(trayIconMenu);
-    m_sysTrayIcon->setIcon(QIcon(":/icon.ico"));
+    m_sysTrayIcon->setIcon(QIcon(":/icons/icon.ico"));
     m_sysTrayIcon->show();
 
     connect(m_sysTrayIcon, &QSystemTrayIcon::activated, [this](auto reason) {

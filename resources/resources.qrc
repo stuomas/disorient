@@ -7,6 +7,6 @@
         <file>icons/save.png</file>
         <file>icons/settings.png</file>
         <file>icons/status.png</file>
-        <file>icon.ico</file>
+        <file>icons/icon.ico</file>
     </qresource>
 </RCC>
