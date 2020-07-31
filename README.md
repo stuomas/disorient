@@ -1,4 +1,4 @@
-<img src="https://github.com/stuomas/disorient/blob/master/resources/images/disorient.png" width=250>
+<p align="center" style="text-align:center"><img src="https://github.com/stuomas/disorient/blob/master/resources/images/disorient.png" width=350></p>
 
 - - - - 
 
