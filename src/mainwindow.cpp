@@ -67,8 +67,6 @@ QVariant MainWindow::readFromRegistry(const QString &key)
 
 void MainWindow::writeToRegistry(const QString &key, const QVariant &value)
 {
-    if(value.toString().isEmpty()) return;
-
     QSettings settings(Names::SettingOrganization, Names::SettingApplication);
     settings.setValue(key, value);
 }
