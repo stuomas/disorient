@@ -1,5 +1,4 @@
 <img src="https://github.com/stuomas/disorient/blob/master/disorient.png" width=250>
-<h1>&#8291;</h1>
 
 Disorient is an application that integrates your Windows PCs to your IoT fleet. It allows you to control various things over MQTT or a WebSocket. It is meant to coexist with home automation software like Home-Assistant to automatically perform tasks when a specific activity happens.
 
