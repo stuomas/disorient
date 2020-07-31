@@ -1,4 +1,4 @@
-<img src="https://github.com/stuomas/disorient/blob/master/resources/images/disorient.png" width=250>
+<p align="center" style="text-align:center"><img src="https://github.com/stuomas/disorient/blob/master/resources/images/disorient.png" width=350></p>
 
 - - - - 
 
@@ -69,4 +69,4 @@ For developing and building from sources, I recommend setting up Qt Creator, sta
 
 - - - - 
 
-<a href="https://www.buymeacoffee.com/stuomas"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" width=170></a>
+<p align="center" style="text-align:center"><a href="https://www.buymeacoffee.com/stuomas"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" width=170></a></p>
