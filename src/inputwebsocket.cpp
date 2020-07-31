@@ -5,7 +5,7 @@ InputWebSocket::InputWebSocket() : m_wsock(new QWebSocket)
     connect(m_wsock, &QWebSocket::connected, this, &InputWebSocket::onConnected);
     connect(m_wsock, &QWebSocket::disconnected, this, &InputWebSocket::onDisconnected);
     connect(m_wsock, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), [=](QAbstractSocket::SocketError error) {
-        emit statusToLog(m_wsock->errorString());
+        emit statusToLog(m_wsock->errorString() + QString(" (error code %1)").arg(error));
     });
 
     //Does not work with static linking yet...
