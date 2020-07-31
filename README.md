@@ -1,4 +1,4 @@
-<img align="left" src="https://github.com/stuomas/disorient/blob/master/disorient.png" width="250"/>
+<img src="https://github.com/stuomas/disorient/blob/master/disorient.png" width=250>
 
 <h1>&#8291;</h1>
 
@@ -63,4 +63,4 @@ The current state of the application is "it works on my machine". If you have bu
 For developing and building from sources, I recommend setting up Qt Creator, static build of Qt 5.15.0, and 64-bit MSVC 2019 compiler. Happy to give more details if you face troubles.
 
 
-<a href="https://www.buymeacoffee.com/stuomas" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+<a align="center" href="https://www.buymeacoffee.com/stuomas"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" width=170></a>
