@@ -55,6 +55,11 @@ Run a script or an executable. Give the full `path` as argument. File extensions
 
 Checking *Attempt to execute unrecognized payloads in PowerShell* will blindly try to execute any incoming payload that is not mapped to a function. This is dangerous, so use only if your systems are secure and you know what you are doing. It is better to write a script and use the *Run script* function. Checking Publish output will publish the standard output/error of the attempt in topic/output.
 
+
+## Screenshots
+
+<img src="https://github.com/stuomas/disorient/blob/master/resources/images/screenshot.png">
+
 ## Development
 
 The current state of the application is "it works on my machine". If you have bugs to report or features to request, please do so.
