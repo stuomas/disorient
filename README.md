@@ -66,5 +66,6 @@ The current state of the application is "it works on my machine". If you have bu
 
 For developing and building from sources, I recommend setting up Qt Creator, static build of Qt 5.15.0, and 64-bit MSVC 2019 compiler. You also need to add a static build of QtMqtt, since it is not included by default. Happy to give more details if you face troubles.
 
+- - - - 
 
-<a align="center" href="https://www.buymeacoffee.com/stuomas"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" width=170></a>
+<a href="https://www.buymeacoffee.com/stuomas"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" width=170></a>
