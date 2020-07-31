@@ -106,7 +106,7 @@ void MainWindow::setupAudioCombobox(const QVector<QString> &audio)
 
 void MainWindow::setupPayloadCombobox()
 {
-    QStringList functions = {"", "Rotate screen (index, angle)", "Set audio device (name)", "Arrange displays (index1, index2)", "Run script (path)"};
+    QStringList functions = {"", "Rotate screen (index, angle)", "Set audio device (name)", "Arrange displays (index1, index2)", "Run executable (path)"};
     // Don't iterate first and last elements since they are not interesting
     for(int i = 1; i < m_ui->verticalLayoutPayloadMap->count() - 1; ++i) {
         QLayout *layout = m_ui->verticalLayoutPayloadMap->itemAt(i)->layout();
