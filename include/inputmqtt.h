@@ -3,6 +3,7 @@
 
 #include <QMqttClient>
 #include <QUrl>
+#include <QTimer>
 
 class InputMqtt : public QObject
 {
@@ -15,6 +16,7 @@ signals:
 public:
     InputMqtt();
     bool validateUrl(const QUrl &url);
+    void disconnect();
     void subscribeToTopic();
 
     //Setters
@@ -40,13 +42,11 @@ public:
 public slots:
     void setClientPort(int p);
     void onPublish(QString msg);
+    void reconnect();
 
 private slots:
-    void onBrokerDisconnected();
     void onStateChanged();
-    void onPing();
     void onMessageReceived(QString msg);
-    void onHostChanged();
 
 private:
     QMqttClient *m_client;
@@ -56,6 +56,8 @@ private:
     QString m_password;
     int m_qos;
     QString m_topic;
+    QTimer *m_autoReconnectTimer = new QTimer(this);
+    bool m_autoReconnectInProgress = false;
 };
 
 #endif // INPUTMQTT_H

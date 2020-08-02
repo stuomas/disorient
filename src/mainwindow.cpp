@@ -176,7 +176,7 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* r
     Q_UNUSED(result)
 
     MSG* msg = static_cast<MSG*>(message);
-    if (msg->message == WM_HOTKEY) {
+    if(msg->message == WM_HOTKEY) {
         switch(msg->wParam) {
         case 101:
             m_endpoint->flip(0);
@@ -192,6 +192,15 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* r
             break;
         }
         return true;
+    } else if(msg->message == WM_POWERBROADCAST) {
+        switch(msg->wParam) {
+        case PBT_APMSUSPEND:
+            log("System suspending");
+            break;
+        case PBT_APMRESUMESUSPEND:
+            log("System waking up, reconnecting...");
+            break;
+        }
     }
     return false;
 }

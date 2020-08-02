@@ -6,15 +6,24 @@ InputMqtt::InputMqtt()
 {  
     m_client = new QMqttClient(this);
     connect(m_client, &QMqttClient::stateChanged, this, &InputMqtt::onStateChanged);
-    connect(m_client, &QMqttClient::disconnected, this, &InputMqtt::onBrokerDisconnected);
-    connect(m_client, &QMqttClient::pingResponseReceived, this, &InputMqtt::onPing);
     connect(m_client, &QMqttClient::messageReceived, this, &InputMqtt::onMessageReceived);
-    connect(m_client, &QMqttClient::hostnameChanged, this, &InputMqtt::onHostChanged);
+    connect(m_autoReconnectTimer, &QTimer::timeout, this, &InputMqtt::reconnect);
 }
 
 bool InputMqtt::validateUrl(const QUrl &url)
 {
     return url.isEmpty() || (url.isValid() && (url.scheme() == "http" || url.scheme() == "https"));
+}
+
+void InputMqtt::reconnect()
+{
+    m_autoReconnectInProgress = true;
+    m_client->connectToHost();
+}
+
+void InputMqtt::disconnect()
+{
+    m_client->disconnectFromHost();
 }
 
 void InputMqtt::subscribeToTopic()
@@ -29,13 +38,16 @@ void InputMqtt::subscribeToTopic()
 
 void InputMqtt::setBroker(const QUrl &addr)
 {
+    m_autoReconnectTimer->stop();
+
     if(m_client->state() == QMqttClient::Connected && addr.host() == m_brokerHostname && addr.port() == m_brokerPort) return;
+
+    m_brokerHostname = addr.host();
+    m_brokerPort = addr.port();
 
     m_client->disconnectFromHost();
 
     if(!addr.isEmpty() && validateUrl(addr)) {
-        m_brokerHostname = addr.host();
-        m_brokerPort = addr.port();
         m_client->setHostname(m_brokerHostname);
         m_client->setPort(m_brokerPort);
         m_client->connectToHost();
@@ -82,15 +94,26 @@ void InputMqtt::setTopic(const QString &topic)
 void InputMqtt::onStateChanged()
 {
     if(m_client->state() == QMqttClient::Disconnected) {
-        emit statusToLog("<font color='red'>MQTT broker disconnected!</font>");
+        if(!m_brokerHostname.isEmpty()) {
+            m_autoReconnectTimer->setInterval(10000);
+            m_autoReconnectTimer->setSingleShot(true);
+            m_autoReconnectTimer->start();
+        } else {
+            qDebug() << "MQTT autoreconnecting...";
+        }
+        if(!m_autoReconnectInProgress) {
+             emit statusToLog("<font color='red'>MQTT broker disconnected!</font>");
+        }
     } else if(m_client->state() == QMqttClient::Connecting) {
-        emit statusToLog("MQTT connecting...");
+        if(!m_autoReconnectInProgress) {
+            emit statusToLog("MQTT connecting...");
+        }
     } else if(m_client->state() == QMqttClient::Connected) {
+        m_autoReconnectInProgress = false;
         emit statusToLog("<font color='green'>MQTT broker connected!</font>");
         subscribeToTopic();
     }
 }
-
 
 void InputMqtt::setClientPort(int p)
 {
@@ -106,20 +129,4 @@ void InputMqtt::onMessageReceived(QString msg)
 {
     emit messageToScreen(msg);
 }
-
-void InputMqtt::onHostChanged()
-{
-
-}
-
-void InputMqtt::onBrokerDisconnected()
-{
-
-}
-
-void InputMqtt::onPing()
-{
-
-}
-
 
