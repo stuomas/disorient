@@ -192,24 +192,31 @@ void Endpoint::onMessageReceived(QString msg)
         //Rearrange displays
         case 3: {
             QStringList args = functionArg.split(",");
+            for(auto& str : args) {
+                str = str.trimmed();
+            }
             rearrangeDisplays(args.at(0).toInt(), args.at(1).toInt());
             emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg(lastActionStatus));
             break;
         }
         //Run script
         case 4: {
-            QDir path(functionArg);
-            QStringList cmdArgs{"/c", path.absolutePath()};
-            lastActionStatus = path.absolutePath();
-
-            if(path.absolutePath().endsWith(".ps1")) {
-                QProcess::startDetached("powershell", {path.absolutePath()});
-            } else if(path.absolutePath().endsWith(".bat") || path.absolutePath().endsWith(".cmd")) {
-                QProcess::startDetached("cmd", cmdArgs);
-            } else if(path.absolutePath().endsWith(".exe")){
-                QProcess::startDetached(path.absolutePath(), {""});
+            lastActionStatus = functionArg;
+            QStringList args(functionArg.split(","));
+            for(auto& str : args) {
+                str = str.trimmed();
+            }
+            QString path = args.at(0);
+            if(path.endsWith(".ps1")) {
+                QProcess::startDetached("powershell", args);
+            } else if(path.endsWith(".bat") || path.endsWith(".cmd")) {
+                args.prepend("/c");
+                QProcess::startDetached("cmd", args);
+            } else if(path.endsWith(".exe")){
+                args.takeFirst();
+                QProcess::startDetached(path, args);
             } else {
-               lastActionStatus = "Unrecognized file extension";
+                lastActionStatus = "Unrecognized file extension";
             }
             emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg(lastActionStatus));
             break;

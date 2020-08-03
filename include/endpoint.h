@@ -25,11 +25,12 @@ public:
     void setRawExecPublish(bool setting) { m_rawExecPublish = setting; }
     void setPayloadMap(QJsonObject payload) { m_payloadMap = payload; }
     QString getWinApiStatus(LONG status);
+    void suspendPC();
 
 signals:
     void statusToLog(QString status);
     void mqttPublish(QString msg);
-    void changeAudioDevice(QString debi);
+    void changeAudioDevice(QString dev);
 
 public slots:
     void onMessageReceived(QString msg);
