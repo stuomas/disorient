@@ -2,6 +2,7 @@ INCLUDEPATH += include src forms resources
 DEPENDPATH += include src forms resources
 
 HEADERS += \
+    include/comboboxitemdelegate.h \
     include/constants.h \
     include/endpoint.h \
     include/inputmqtt.h \
@@ -11,6 +12,7 @@ HEADERS += \
     include/audioendpointcontroller.h
 
 SOURCES += \
+    src/comboboxitemdelegate.cpp \
     src/endpoint.cpp \
     src/inputmqtt.cpp \
     src/inputwebsocket.cpp \

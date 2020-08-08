@@ -40,6 +40,8 @@ public:
     void setupAudioCombobox(const QVector<QString> &audio);
     void setupPayloadCombobox();
     void setupHotkeys();
+    void setupPayloadTable();
+    void setupStyles();
     void savePayloadMap();
     void loadPayloadMap();
     QString timestamp();
@@ -48,6 +50,7 @@ public:
 
 private slots:
     void onStatusReceived(const QString &status);
+    void onAddRowClicked();
     void on_pushButtonSaveSettings_clicked();
     void on_checkBoxExecPermission_stateChanged(int arg1);
     void on_lineEditMqttTopic_textChanged(const QString &arg1);

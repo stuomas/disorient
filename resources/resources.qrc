@@ -8,5 +8,6 @@
         <file>icons/settings.png</file>
         <file>icons/status.png</file>
         <file>icons/icon.ico</file>
+        <file>icons/plus.png</file>
     </qresource>
 </RCC>

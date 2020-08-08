@@ -2,9 +2,10 @@
 #include "ui_mainwindow.h"
 #include "constants.h"
 #include <QJsonArray>
+#include "comboboxitemdelegate.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), m_ui(new Ui::MainWindow), m_endpoint(new Endpoint), m_iWebSocket(new InputWebSocket), m_iMqtt(new InputMqtt), m_audioDevice(new AudioEndpointController)
-{  
+{
     connect(m_endpoint, &Endpoint::statusToLog, this, &MainWindow::onStatusReceived);
     connect(m_iWebSocket, &InputWebSocket::statusToLog, this, &MainWindow::onStatusReceived);
     connect(m_iMqtt, &InputMqtt::statusToLog, this, &MainWindow::onStatusReceived);
@@ -20,11 +21,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), m_ui(new Ui::Main
     setupAudioCombobox(m_audioDevice->getAllAudioDevices());
     setupHotkeys();
     setupPayloadCombobox();
+    setupPayloadTable();
     loadSettingsFromRegistry();
-    QFile style(":/styles.qss");
-    style.open(QFile::ReadOnly);
-    setStyleSheet(QString::fromLatin1(style.readAll()));
-    style.close();
+    setupStyles();
     m_ui->verticalLayout_3->setAlignment(Qt::AlignTop);
     m_ui->checkBoxPublishOutput->setDisabled(!m_ui->checkBoxExecPermission->isChecked());
     m_ui->checkBoxPublishOutput->setText(QString("Publish output in topic %1%2").arg(m_ui->lineEditMqttTopic->text()).arg(Names::MqttPublishPath));
@@ -86,6 +85,22 @@ void MainWindow::onStatusReceived(const QString &status)
     //m_sysTrayIcon->setToolTip(QString("%1\n%2").arg(Names::SettingApplication).arg(status));
 }
 
+void MainWindow::onAddRowClicked()
+{
+    auto row = m_ui->tableWidget->rowCount();
+    auto col = m_ui->tableWidget->columnCount();
+    m_ui->tableWidget->insertRow(row);
+
+    for(int j = 0; j < col; ++j) {
+        QTableWidgetItem *pCell = m_ui->tableWidget->item(row, j);
+        if(!pCell) {
+            pCell = new QTableWidgetItem;
+            m_ui->tableWidget->setItem(row, j, pCell);
+        }
+        pCell->setText("");
+    }
+}
+
 void MainWindow::setupDisplayCombobox(const QVector<DISPLAY_DEVICE> &displays)
 {
     int n = 0;
@@ -104,7 +119,7 @@ void MainWindow::setupAudioCombobox(const QVector<QString> &audio)
 
 void MainWindow::setupPayloadCombobox()
 {
-    QStringList functions = {"", "Rotate screen (index, angle)", "Set audio device (name)", "Arrange displays (index1, index2)", "Run executable (path)"};
+    QStringList functions = Names::functions;
     // Don't iterate first and last elements since they are not interesting
     for(int i = 1; i < m_ui->verticalLayoutPayloadMap->count() - 1; ++i) {
         QLayout *layout = m_ui->verticalLayoutPayloadMap->itemAt(i)->layout();
@@ -124,11 +139,40 @@ void MainWindow::setupHotkeys()
     }
 }
 
+void MainWindow::setupPayloadTable()
+{
+    auto payloadTable = m_ui->tableWidget;
+    ComboBoxItemDelegate* cbid = new ComboBoxItemDelegate(payloadTable);
+    payloadTable->setItemDelegateForColumn(1, cbid);
+    payloadTable->setColumnCount(3);
+    payloadTable->setHorizontalHeaderLabels({"Payload", "Function", "Arguments"});
+    payloadTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    payloadTable->setRowCount(10);
+
+    QPushButton *pushButtonAdd = new QPushButton("", m_ui->tableWidget);
+    pushButtonAdd->setIcon(QIcon(":/icons/plus.png"));
+    pushButtonAdd->setIconSize(QSize(10, 10));
+    pushButtonAdd->setToolTip("Add new row");
+    pushButtonAdd->move(5,5);
+    pushButtonAdd->resize(22,22);
+    pushButtonAdd->show();
+    connect(pushButtonAdd, &QPushButton::clicked, this, &MainWindow::onAddRowClicked);
+}
+
+void MainWindow::setupStyles()
+{
+    QFile style(":/styles.qss");
+    style.open(QFile::ReadOnly);
+    setStyleSheet(QString::fromLatin1(style.readAll()));
+    style.close();
+}
+
 void MainWindow::setupSysTray()
 {
     //Adapted from amin-ahmadi.com
     m_closing = false;
     auto exitAction = new QAction(tr("&Exit"), this);
+    exitAction->setIcon(QIcon(":/icons/icon.ico"));
     connect(exitAction, &QAction::triggered, [this]() {
         m_closing = true;
         close();
@@ -276,50 +320,74 @@ void MainWindow::savePayloadMap()
     QJsonArray payloadArr;
     QJsonArray functionArr;
     QJsonArray argumentArr;
-    // Don't iterate first and last elements since they are not interesting
-    for(int i = 1; i < m_ui->verticalLayoutPayloadMap->count() - 1; ++i) {
-        QLayout *layout = m_ui->verticalLayoutPayloadMap->itemAt(i)->layout();
-        QLineEdit* payload = dynamic_cast<QLineEdit*>(layout->itemAt(0)->widget());
-        QComboBox* function = dynamic_cast<QComboBox*>(layout->itemAt(1)->widget());
-        QLineEdit* argument = dynamic_cast<QLineEdit*>(layout->itemAt(2)->widget());
-        payloadArr.push_back(payload->text());
-        functionArr.push_back(function->currentIndex());
-        argumentArr.push_back(argument->text());
+    QList<int> emptyRows;
+
+    auto payloadTable = m_ui->tableWidget;
+    for(int i = 0; i < payloadTable->rowCount(); ++i) {
+        QTableWidgetItem *payload = m_ui->tableWidget->item(i, 0);
+        QTableWidgetItem *function = m_ui->tableWidget->item(i, 1);
+        QTableWidgetItem *argument = m_ui->tableWidget->item(i, 2);
+
+        if(payload->text().isEmpty() && argument->text().isEmpty()) {
+            emptyRows.push_back(i);
+        } else {
+            payloadArr.push_back(payload->text());
+            functionArr.push_back(function->text());
+            argumentArr.push_back(argument->text());
+        }
     }
+
+    std::reverse(emptyRows.begin(), emptyRows.end());
+    for(int i : emptyRows) {
+        payloadTable->removeRow(i);
+    }
+
     payloadObject.insert("payload", payloadArr);
     payloadObject.insert("function", functionArr);
     payloadObject.insert("argument", argumentArr);
 
     m_payloadMap = payloadObject;
     m_endpoint->setPayloadMap(m_payloadMap);
+    payloadTable->repaint();
 }
 
 void MainWindow::loadPayloadMap()
 {
     QJsonObject payloadObject = readFromRegistry(Names::SettingPayloadMap).toJsonObject();
 
-    auto savedArraySize = payloadObject.value("payload").toArray().count();
-    auto currentMapSize = m_ui->verticalLayoutPayloadMap->count();
+    auto payloadTable = m_ui->tableWidget;
 
-    if(savedArraySize < currentMapSize - 2) return;
+    payloadTable->setRowCount(payloadObject.value("payload").toArray().size());
 
-    // Don't iterate first and last elements since they are not interesting
-    for(int i = 1; i < currentMapSize - 1; ++i) {
-        QLayout *layout = m_ui->verticalLayoutPayloadMap->itemAt(i)->layout();
-        QLineEdit* payload = dynamic_cast<QLineEdit*>(layout->itemAt(0)->widget());
-        QComboBox* function = dynamic_cast<QComboBox*>(layout->itemAt(1)->widget());
-        QLineEdit* argument = dynamic_cast<QLineEdit*>(layout->itemAt(2)->widget());
+    for(int i = 0; i < payloadTable->rowCount(); ++i) {
+        QTableWidgetItem *payload = m_ui->tableWidget->item(i, 0);
+        QTableWidgetItem *function = m_ui->tableWidget->item(i, 1);
+        QTableWidgetItem *argument = m_ui->tableWidget->item(i, 2);
 
-        payload->setText(payloadObject.value("payload").toArray()[i-1].toString());
-        function->setCurrentIndex(payloadObject.value("function").toArray()[i-1].toInt());
-        argument->setText(payloadObject.value("argument").toArray()[i-1].toString());
+        if(!payload) {
+            payload = new QTableWidgetItem(QString(""));
+            payloadTable->setItem(i, 0, payload);
+        }
+        if(!function) {
+            function = new QTableWidgetItem(QString(""));
+            payloadTable->setItem(i, 1, function);
+        }
+        if(!argument) {
+            argument = new QTableWidgetItem(QString(""));
+            payloadTable->setItem(i, 2, argument);
+        }
+
+        payload->setText(payloadObject.value("payload").toArray()[i].toString());
+        function->setText(payloadObject.value("function").toArray()[i].toString());
+        argument->setText(payloadObject.value("argument").toArray()[i].toString());
     }
+
     m_payloadMap = payloadObject;
     m_endpoint->setPayloadMap(m_payloadMap);
 }
 
 void MainWindow::on_pushButtonSaveSettings_clicked()
-{    
+{
     //Autostart enabled
     QSettings bootSettings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     QString path = QDir::toNativeSeparators(QCoreApplication::applicationFilePath());

@@ -1,7 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#include <QString>
+#include <QStringList>
 
 namespace Names {
 //Names used in Windows registry
@@ -24,6 +24,7 @@ const QString SettingSaveCredentials = "dis_opt_14";
 
 //Other stuff
 const QString MqttPublishPath = "/output";
+const QStringList functions = {"", "Rotate screen (index, angle)", "Set audio device (name)", "Arrange displays (index1, index2)", "Run executable (path)"};
 }
 
 #endif // CONSTANTS_H

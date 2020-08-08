@@ -150,31 +150,34 @@ void Endpoint::onMessageReceived(QString msg)
     QJsonArray payloadArr = payloads.value("payload").toArray();
     QJsonArray functionArr = payloads.value("function").toArray();
     QJsonArray argumentArr = payloads.value("argument").toArray();
-    int functionIndex = -1;
+    QString functionName;
     QString functionArg;
     QString payloadName;
     bool unrecognizedMsg = false;
 
     for(int i = 0; i < payloadArr.size(); ++i) {
         if(payloadArr[i].toString() == msg) {
-            functionIndex = functionArr[i].toInt();
+            functionName = functionArr[i].toString();
             functionArg = argumentArr[i].toString();
             payloadName = payloadArr[i].toString();
         }
     }
 
-    switch(functionIndex) {
-        case -1: {
-            unrecognizedMsg = true;
-            emit statusToLog("Unrecognized message: " + msg);
-            break;
-        }
-        case 0:
-            break;
+    if(functionName == Names::functions.at(0)) {
+        unrecognizedMsg = true;
+        emit statusToLog("Unrecognized message: " + msg);
+
+    } else if(functionName == Names::functions.at(1)) {
         //Display rotation
-        case 1: {
+        QStringList args = functionArg.split(",");
+        for(auto& str : args) {
+            str = str.trimmed();
+        }
+        if(args.size() < 2) {
+            emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg("Invalid arguments"));
+        } else {
             bool ok;
-            int angle = functionArg.toInt(&ok);
+            int angle = args.at(1).toInt(&ok);
             lastActionStatus = "Invalid angle";
             if(ok) {
                 QStringList args = functionArg.split(",");
@@ -182,46 +185,50 @@ void Endpoint::onMessageReceived(QString msg)
                 flip(angle);
             }
             emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg(lastActionStatus));
-            break;
-        }
-        //Change audio device
-        case 2:
-            emit changeAudioDevice(functionArg);
-            emit statusToLog(QString("🠆 %1").arg(payloadName));
-            break;
-        //Rearrange displays
-        case 3: {
-            QStringList args = functionArg.split(",");
-            for(auto& str : args) {
-                str = str.trimmed();
-            }
-            rearrangeDisplays(args.at(0).toInt(), args.at(1).toInt());
-            emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg(lastActionStatus));
-            break;
-        }
-        //Run script
-        case 4: {
-            lastActionStatus = functionArg;
-            QStringList args(functionArg.split(","));
-            for(auto& str : args) {
-                str = str.trimmed();
-            }
-            QString path = args.at(0);
-            if(path.endsWith(".ps1")) {
-                QProcess::startDetached("powershell", args);
-            } else if(path.endsWith(".bat") || path.endsWith(".cmd")) {
-                args.prepend("/c");
-                QProcess::startDetached("cmd", args);
-            } else if(path.endsWith(".exe")){
-                args.takeFirst();
-                QProcess::startDetached(path, args);
-            } else {
-                lastActionStatus = "Unrecognized file extension";
-            }
-            emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg(lastActionStatus));
-            break;
         }
 
+    } else if(functionName == Names::functions.at(2)) {
+        //Change audio device
+        emit changeAudioDevice(functionArg);
+        emit statusToLog(QString("🠆 %1").arg(payloadName));
+
+    } else if(functionName == Names::functions.at(3)) {
+        //Rearrange displays
+        QStringList args = functionArg.split(",");
+        for(auto& str : args) {
+            str = str.trimmed();
+        }
+        if(args.size() < 2) {
+            emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg("Invalid arguments"));
+        } else {
+            rearrangeDisplays(args.at(0).toInt(), args.at(1).toInt());
+            emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg(lastActionStatus));
+        }
+
+    } else if(functionName == Names::functions.at(4)) {
+        //Run script
+        lastActionStatus = functionArg;
+        QStringList args(functionArg.split(","));
+        for(auto& str : args) {
+            str = str.trimmed();
+        }
+        QString path = args.at(0);
+        if(path.endsWith(".ps1")) {
+            QProcess::startDetached("powershell", args);
+        } else if(path.endsWith(".bat") || path.endsWith(".cmd")) {
+            args.prepend("/c");
+            QProcess::startDetached("cmd", args);
+        } else if(path.endsWith(".exe")){
+            args.takeFirst();
+            QProcess::startDetached(path, args);
+        } else {
+            lastActionStatus = "Unrecognized file extension";
+        }
+        emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg(lastActionStatus));
+
+    } else {
+        unrecognizedMsg = true;
+        emit statusToLog("Unrecognized message: " + msg);
     }
 
     if(m_rawExecPermission && unrecognizedMsg && !msg.trimmed().isEmpty()) {
@@ -234,7 +241,7 @@ void Endpoint::onMessageReceived(QString msg)
         powershell.waitForReadyRead(10000);
         QString stdErr = powershell.readAllStandardError().trimmed();
         QString stdOut = powershell.readAllStandardOutput().trimmed();
-        emit statusToLog(stdErr + stdOut);
+        emit statusToLog("Output: " + stdErr + stdOut);
         if(m_rawExecPublish) {
             emit mqttPublish(stdErr + stdOut);
         }
