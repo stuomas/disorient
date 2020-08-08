@@ -35,8 +35,9 @@ Map any text coming from WebSocket or MQTT broker to a function of choice. The f
 Rotates the display of given `index` to given `angle`. Angle can only be 0, 90, 180, or 270. Get the correct index from the display list in the Help tab. If all your displays are called *Generic PnP Monitor* it just means you have not installed the manufacturer's driver, or there isn't any, and it probably doesn't matter, their corresponding indices stay the same.
 
 For example setting a following mapping
-
-`set_portrait_1 `  `Rotate screen (index, angle)`  `0,90`
+| Payload            | Function                        | Arguments |
+| ------------------ | ------------------------------- | --------- |
+| `set_portrait_1 `  | `Rotate screen (index, angle)`  |   `0,90`  |
 
 sets your first listed display to portrait mode when "set_portrait_1" message arrives from a subscribed MQTT topic or a WebSocket server.
 
