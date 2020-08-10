@@ -1,13 +1,18 @@
 #include "inputmqtt.h"
-#include "constants.h"
 #include <QtMqtt/QMqttClient>
 
 InputMqtt::InputMqtt()
-{  
+{
     m_client = new QMqttClient(this);
     connect(m_client, &QMqttClient::stateChanged, this, &InputMqtt::onStateChanged);
     connect(m_client, &QMqttClient::messageReceived, this, &InputMqtt::onMessageReceived);
     connect(m_autoReconnectTimer, &QTimer::timeout, this, &InputMqtt::reconnect);
+    setObjectName("InputMqtt");
+}
+
+InputMqtt::~InputMqtt()
+{
+    delete m_client;
 }
 
 bool InputMqtt::validateUrl(const QUrl &url)
@@ -52,7 +57,7 @@ void InputMqtt::setBroker(const QUrl &addr)
         m_client->setPort(m_brokerPort);
         m_client->connectToHost();
     } else if(!validateUrl(addr)) {
-        emit statusToLog("Invalid MQTT broker address!");
+        emit statusToLog("Invalid broker address!");
     }
 }
 
@@ -102,15 +107,15 @@ void InputMqtt::onStateChanged()
             qDebug() << "MQTT autoreconnecting...";
         }
         if(!m_autoReconnectInProgress) {
-             emit statusToLog("<font color='red'>MQTT broker disconnected!</font>");
+             emit statusToLog("<font color='red'>Broker disconnected!</font>");
         }
     } else if(m_client->state() == QMqttClient::Connecting) {
         if(!m_autoReconnectInProgress) {
-            emit statusToLog("MQTT connecting...");
+            emit statusToLog("Connecting...");
         }
     } else if(m_client->state() == QMqttClient::Connected) {
         m_autoReconnectInProgress = false;
-        emit statusToLog("<font color='green'>MQTT broker connected!</font>");
+        emit statusToLog("Broker connected!");
         subscribeToTopic();
     }
 }
@@ -120,12 +125,12 @@ void InputMqtt::setClientPort(int p)
     m_client->setPort(p);
 }
 
-void InputMqtt::onPublish(QString msg)
+void InputMqtt::onPublish(const QString &msg, const QString &subtopic)
 {
-    m_client->publish(QMqttTopicName(m_topic + Names::MqttPublishPath), msg.toUtf8(), m_qos);
+    m_client->publish(QMqttTopicName(QString("%1/%2").arg(m_topic).arg(subtopic)), msg.toUtf8(), m_qos);
 }
 
-void InputMqtt::onMessageReceived(QString msg)
+void InputMqtt::onMessageReceived(const QString &msg)
 {
     emit messageToScreen(msg);
 }

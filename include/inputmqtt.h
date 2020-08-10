@@ -4,17 +4,19 @@
 #include <QMqttClient>
 #include <QUrl>
 #include <QTimer>
+#include "constants.h"
 
 class InputMqtt : public QObject
 {
     Q_OBJECT
 
 signals:
-    void messageToScreen(QString msg);
-    void statusToLog(QString msg);
+    void messageToScreen(const QString &msg);
+    void statusToLog(const QString &msg, const QString &sender = Names::InputMqttName);
 
 public:
     InputMqtt();
+    ~InputMqtt();
     bool validateUrl(const QUrl &url);
     void disconnect();
     void subscribeToTopic();
@@ -41,12 +43,12 @@ public:
 
 public slots:
     void setClientPort(int p);
-    void onPublish(QString msg);
+    void onPublish(const QString &msg, const QString &subtopic = "");
     void reconnect();
 
 private slots:
     void onStateChanged();
-    void onMessageReceived(QString msg);
+    void onMessageReceived(const QString &msg);
 
 private:
     QMqttClient *m_client;

@@ -12,21 +12,19 @@ Some example use cases include
 - Switch the default audio output device between headphones/speakers/theatre, for example when starting a gaming activity, or when your wireless headphones do not automatically become default when turned on (looking at you, Arctis).
 - Launch a script or an application or execute PowerShell commands.
 
-The first four examples are probably relevant only to a small niche, perhaps only me, but the last one might make Disorient useful even to you.
-
 ## Installation
 
 No installation required. Launch the executable, choose settings and forget.
 
 ## Usage
 
-Disorient accepts input from a MQTT broker or a WebSocket server. 
+Input is accepted from a MQTT broker or a WebSocket server. 
 
 In the settings tab, set up the connection to your MQTT broker or WebSocket server, or both. In payload mapping section, select what incoming text payload runs what function. More information about available functions and their arguments in [Payload mapping](#payload-mapping).
 
 ### Payload mapping
 
-Map any text coming from WebSocket or MQTT broker to a function of choice. The function list below explains what arguments are needed.
+Map any text coming from MQTT or WebSocket server to a function of choice. The function list below explains what arguments are needed.
 
 #### Functions
 
@@ -55,8 +53,11 @@ Run a script or an executable. Give the full `path` as argument. File extensions
 
 #### Execute unrecognized payloads
 
-Checking *Attempt to execute unrecognized payloads in PowerShell* will blindly try to execute any incoming payload that is not mapped to a function. This is dangerous, so use only if your systems are secure and you know what you are doing. It is better to write a script and use the *Run script* function. Checking Publish output will publish the standard output/error of the attempt in topic/output.
+Checking *Attempt to execute unrecognized payloads in PowerShell* will blindly try to execute any incoming payload that is not mapped to a function. This is dangerous, so use only if your systems are secure and you know what you are doing. It is better to write a script and use the *Run script* function. Checking Publish output will publish the standard output/error of the attempt in `<chosen_topic>/powershell/response`.
 
+#### Responses
+
+When the function has run, a response will be published in topic `<chosen_topic>/<payload_name>/response` with a message, which in some cases is empty. For WebSocket, a text message with the format `<payload_name>/response/message` is sent back to the server. The response can be used as an acknoledgement that the command was received and executed.
 
 ## Screenshots
 

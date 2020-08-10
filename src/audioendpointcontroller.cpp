@@ -12,6 +12,11 @@ AudioEndpointController::AudioEndpointController()
     createDeviceEnumerator(m_state);
 }
 
+AudioEndpointController::~AudioEndpointController()
+{
+    delete m_state;
+}
+
 void AudioEndpointController::refreshList()
 {
     allAudioDevices.clear();

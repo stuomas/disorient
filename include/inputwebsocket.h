@@ -10,6 +10,7 @@
 #include <QString>
 #include <QtWebSockets/QWebSocket>
 #include <QTimer>
+#include "constants.h"
 
 class InputWebSocket : public QObject
 {
@@ -19,19 +20,21 @@ public:
     InputWebSocket();
     ~InputWebSocket();
     void connectToServer(const QUrl &addr);
-    bool validateUrl(QUrl url);
+    bool validateUrl(const QUrl &url);
     void closeConnection();
     void reconnect();
 
 signals:
-    void messageToScreen(QString msg);
-    void statusToLog(QString msg);
+    void messageToScreen(const QString &msg);
+    void statusToLog(const QString &msg, const QString &sender = Names::InputWebSocketName);
 
+public slots:
+    void onPublish(const QString &msg, const QString &subtopic = "");
 private slots:
     void onConnected();
     void onDisconnected();
-    void onTextMessageReceived(QString msg);
-    void onError(QAbstractSocket::SocketError error);
+    void onTextMessageReceived(const QString &msg);
+    void onError(const QAbstractSocket::SocketError &error);
 
 private:
     QWebSocket *m_wsock;

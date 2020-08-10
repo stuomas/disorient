@@ -23,8 +23,11 @@ const QString SettingPublishOutput = "dis_opt_13";
 const QString SettingSaveCredentials = "dis_opt_14";
 
 //Other stuff
-const QString MqttPublishPath = "/output";
-const QStringList functions = {"", "Rotate screen (index, angle)", "Set audio device (name)", "Arrange displays (index1, index2)", "Run executable (path)"};
+const QString InputMqttName = "InputMqtt";
+const QString InputWebSocketName = "InputWebSocket";
+const QString MqttResponseSubtopic = "response";
+const QString MqttPowershellSubtopic = QString("%1/%2").arg("powershell").arg(MqttResponseSubtopic);
+const QStringList Functions = {"", "Rotate screen (index, angle)", "Set audio device (name)", "Arrange displays (index1, index2)", "Run executable (path)"};
 }
 
 #endif // CONSTANTS_H

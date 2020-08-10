@@ -16,7 +16,6 @@ QWidget *ComboBoxItemDelegate::createEditor(QWidget *parent, const QStyleOptionV
     QStringList functions = {"", "Rotate screen (index, angle)", "Set audio device (name)", "Arrange displays (index1, index2)", "Run executable (path)"};
     // Create the combobox and populate it
     QComboBox *cb = new QComboBox(parent);
-    const int row = index.row();
     cb->addItems(functions);
     cb->setCurrentIndex(1);
     return cb;

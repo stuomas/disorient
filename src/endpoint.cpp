@@ -66,7 +66,7 @@ QString Endpoint::getWinApiStatus(LONG status)
     }
 }
 
-void Endpoint::flip(int angle)
+QString Endpoint::flip(int angle)
 {
     switch(angle) {
     case 0:
@@ -86,16 +86,17 @@ void Endpoint::flip(int angle)
         adjustResolution(angle, dm.dmPelsWidth, dm.dmPelsHeight);
         break;
     default:
-        lastActionStatus = "Invalid angle";
-        return;
+        return "Invalid angle";
     }
 
     if(dm.dmFields | DM_DISPLAYORIENTATION) {
-        lastActionStatus = getWinApiStatus(ChangeDisplaySettingsEx(chosenDisplay.DeviceName, &dm, nullptr, 0, nullptr));
+        return getWinApiStatus(ChangeDisplaySettingsEx(chosenDisplay.DeviceName, &dm, nullptr, 0, nullptr));
+    } else {
+        return "Unknown error";
     }
 }
 
-void Endpoint::rearrangeDisplays(int idxPrimary, int idxSecondary)
+QString Endpoint::rearrangeDisplays(int idxPrimary, int idxSecondary)
 {
     DEVMODE dmPri, dmSec;
     dmPri.dmSize = sizeof(dmPri);
@@ -124,7 +125,7 @@ void Endpoint::rearrangeDisplays(int idxPrimary, int idxSecondary)
     ChangeDisplaySettingsEx(allDisplayAdapters[idxSecondary].DeviceName, &dmSec, NULL, CDS_UPDATEREGISTRY | CDS_NORESET, NULL);
     ChangeDisplaySettingsEx(0,0,0,0,0);
 
-    lastActionStatus = getWinApiStatus(status);
+    return getWinApiStatus(status);
 }
 
 void Endpoint::adjustResolution(int angle, unsigned long &w, unsigned long &h)
@@ -143,16 +144,16 @@ void Endpoint::adjustResolution(int angle, unsigned long &w, unsigned long &h)
     }
 }
 
-void Endpoint::onMessageReceived(QString msg)
+//TODO: support multiple (comma-separated) payloads in one message
+void Endpoint::onMessageReceived(const QString &msg)
 {
-    QJsonObject payloads = m_payloadMap;
+    QString origin = sender()->objectName();
 
+    QString lastActionStatus, functionName, functionArg, payloadName;
+    QJsonObject payloads = m_payloadMap;
     QJsonArray payloadArr = payloads.value("payload").toArray();
     QJsonArray functionArr = payloads.value("function").toArray();
     QJsonArray argumentArr = payloads.value("argument").toArray();
-    QString functionName;
-    QString functionArg;
-    QString payloadName;
     bool unrecognizedMsg = false;
 
     for(int i = 0; i < payloadArr.size(); ++i) {
@@ -163,18 +164,23 @@ void Endpoint::onMessageReceived(QString msg)
         }
     }
 
-    if(functionName == Names::functions.at(0)) {
+    /***********************************************************************
+    ** Unrecognized message when functionName has not been assigned anything
+    ************************************************************************/
+    if(functionName.isEmpty()) {
         unrecognizedMsg = true;
-        emit statusToLog("Unrecognized message: " + msg);
-
-    } else if(functionName == Names::functions.at(1)) {
-        //Display rotation
+        emit statusToLog("Unrecognized message: " + msg, origin);
+    }
+    /***********************************************************************
+    ** Rotate screen (index, angle)
+    ************************************************************************/
+    else if(functionName == Names::Functions.at(1)) {
         QStringList args = functionArg.split(",");
         for(auto& str : args) {
             str = str.trimmed();
         }
         if(args.size() < 2) {
-            emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg("Invalid arguments"));
+            lastActionStatus = "Invalid arguments";
         } else {
             bool ok;
             int angle = args.at(1).toInt(&ok);
@@ -182,32 +188,34 @@ void Endpoint::onMessageReceived(QString msg)
             if(ok) {
                 QStringList args = functionArg.split(",");
                 enumerateSettings(args.at(0).toInt());
-                flip(angle);
+                lastActionStatus = flip(angle);
             }
-            emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg(lastActionStatus));
         }
-
-    } else if(functionName == Names::functions.at(2)) {
-        //Change audio device
+    }
+    /***********************************************************************
+    ** Set audio device (name)
+    ************************************************************************/
+    else if(functionName == Names::Functions.at(2)) {
         emit changeAudioDevice(functionArg);
-        emit statusToLog(QString("🠆 %1").arg(payloadName));
-
-    } else if(functionName == Names::functions.at(3)) {
-        //Rearrange displays
+    }
+    /***********************************************************************
+    ** Arrange displays (index1, index2)
+    ************************************************************************/
+    else if(functionName == Names::Functions.at(3)) {
         QStringList args = functionArg.split(",");
         for(auto& str : args) {
             str = str.trimmed();
         }
         if(args.size() < 2) {
-            emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg("Invalid arguments"));
+            lastActionStatus = "Invalid arguments";
         } else {
-            rearrangeDisplays(args.at(0).toInt(), args.at(1).toInt());
-            emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg(lastActionStatus));
+            lastActionStatus = rearrangeDisplays(args.at(0).toInt(), args.at(1).toInt());
         }
-
-    } else if(functionName == Names::functions.at(4)) {
-        //Run script
-        lastActionStatus = functionArg;
+    }
+    /***********************************************************************
+    ** Run executable (path)
+    ************************************************************************/
+    else if(functionName == Names::Functions.at(4)) {
         QStringList args(functionArg.split(","));
         for(auto& str : args) {
             str = str.trimmed();
@@ -224,11 +232,6 @@ void Endpoint::onMessageReceived(QString msg)
         } else {
             lastActionStatus = "Unrecognized file extension";
         }
-        emit statusToLog(QString("🠆 %1 (%2)").arg(payloadName).arg(lastActionStatus));
-
-    } else {
-        unrecognizedMsg = true;
-        emit statusToLog("Unrecognized message: " + msg);
     }
 
     if(m_rawExecPermission && unrecognizedMsg && !msg.trimmed().isEmpty()) {
@@ -242,10 +245,24 @@ void Endpoint::onMessageReceived(QString msg)
         QString stdErr = powershell.readAllStandardError().trimmed();
         QString stdOut = powershell.readAllStandardOutput().trimmed();
         emit statusToLog("Output: " + stdErr + stdOut);
-        if(m_rawExecPublish) {
-            emit mqttPublish(stdErr + stdOut);
-        }
         powershell.close();
+        if(m_rawExecPublish) {
+            sendResponse(origin, stdErr + stdOut, Names::MqttPowershellSubtopic);
+        }
+    } else if(!unrecognizedMsg) {
+        emit statusToLog(QString("%1 (%2)").arg(payloadName).arg(lastActionStatus), origin);
+        sendResponse(origin, lastActionStatus, QString("%1/%2").arg(payloadName).arg(Names::MqttResponseSubtopic));
+    } else {
+        sendResponse(origin, "Unrecognized message", QString("%1/%2").arg(msg).arg(Names::MqttResponseSubtopic));
+    }
+}
+
+void Endpoint::sendResponse(const QString &sender, const QString &response, const QString &topic)
+{
+    if(sender == "InputMqtt") {
+        emit mqttPublish(response, topic);
+    } else if(sender == "InputWebSocket") {
+        emit websocketPublish(response, topic);
     }
 }
 

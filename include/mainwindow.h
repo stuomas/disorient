@@ -48,8 +48,12 @@ public:
     QVector<QString> getAllAudioDevices();
     void removeFromRegistry(const QString &key);
 
+signals:
+    void mqttPublish(const QString &msg, const QString &subtopic = "");
+    void websocketPublish(const QString &msg, const QString &subtopic = "");
+
 private slots:
-    void onStatusReceived(const QString &status);
+    void onStatusReceived(const QString &status, const QString &sender);
     void onAddRowClicked();
     void on_pushButtonSaveSettings_clicked();
     void on_checkBoxExecPermission_stateChanged(int arg1);

@@ -25,7 +25,7 @@ class AudioEndpointController : public QObject
 
 public:
     AudioEndpointController();
-
+    ~AudioEndpointController();
     HRESULT SetDefaultAudioPlaybackDevice(LPCWSTR devID);
     HRESULT printDeviceInfo(IMMDevice* pDevice, int index);
     void createDeviceEnumerator(TGlobalState* state);

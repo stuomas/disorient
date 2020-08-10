@@ -14,8 +14,8 @@ class Endpoint : public QObject
 
 public:
     Endpoint();
-    void flip(int angle);
-    void rearrangeDisplays(int idxPrimary, int idxSecondary);
+    QString flip(int angle);
+    QString rearrangeDisplays(int idxPrimary, int idxSecondary);
     void adjustResolution(int angle, unsigned long &w, unsigned long &h);
     void enumerateDevices();
     void enumerateSettings(int displayNum);
@@ -25,19 +25,19 @@ public:
     void setRawExecPublish(bool setting) { m_rawExecPublish = setting; }
     void setPayloadMap(QJsonObject payload) { m_payloadMap = payload; }
     QString getWinApiStatus(LONG status);
-    void suspendPC();
+    void sendResponse(const QString &sender, const QString &topic, const QString &response);
 
 signals:
-    void statusToLog(QString status);
-    void mqttPublish(QString msg);
-    void changeAudioDevice(QString dev);
+    void statusToLog(const QString &status, const QString &sender = "");
+    void mqttPublish(const QString &msg, const QString &subtopic = "");
+    void websocketPublish(const QString &msg, const QString &subtopic = "");
+    void changeAudioDevice(const QString &dev);
 
 public slots:
-    void onMessageReceived(QString msg);
+    void onMessageReceived(const QString &msg);
 
 private:
     DEVMODE dm;
-    QString lastActionStatus;
     bool m_rawExecPermission = false;
     bool m_rawExecPublish = false;
     QJsonObject m_payloadMap;

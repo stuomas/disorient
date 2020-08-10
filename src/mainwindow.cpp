@@ -9,13 +9,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), m_ui(new Ui::Main
     connect(m_endpoint, &Endpoint::statusToLog, this, &MainWindow::onStatusReceived);
     connect(m_iWebSocket, &InputWebSocket::statusToLog, this, &MainWindow::onStatusReceived);
     connect(m_iMqtt, &InputMqtt::statusToLog, this, &MainWindow::onStatusReceived);
+    connect(this, &MainWindow::mqttPublish, m_iMqtt, &InputMqtt::onPublish);
+    connect(this, &MainWindow::websocketPublish, m_iWebSocket, &InputWebSocket::onPublish);
     connect(m_endpoint, &Endpoint::mqttPublish, m_iMqtt, &InputMqtt::onPublish);
+    connect(m_endpoint, &Endpoint::websocketPublish, m_iWebSocket, &InputWebSocket::onPublish);
     connect(m_endpoint, &Endpoint::changeAudioDevice, m_audioDevice, &AudioEndpointController::onChangeRequest);
     connect(m_iWebSocket, &InputWebSocket::messageToScreen, m_endpoint, &Endpoint::onMessageReceived);
     connect(m_iMqtt, &InputMqtt::messageToScreen, m_endpoint, &Endpoint::onMessageReceived);
 
     m_ui->setupUi(this);
-    log(QString("%1 ready!").arg(Names::SettingApplication));
+    log(QString("%1 started").arg(Names::SettingApplication));
     setupSysTray();
     setupDisplayCombobox(m_endpoint->getDisplays());
     setupAudioCombobox(m_audioDevice->getAllAudioDevices());
@@ -26,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), m_ui(new Ui::Main
     setupStyles();
     m_ui->verticalLayout_3->setAlignment(Qt::AlignTop);
     m_ui->checkBoxPublishOutput->setDisabled(!m_ui->checkBoxExecPermission->isChecked());
-    m_ui->checkBoxPublishOutput->setText(QString("Publish output in topic %1%2").arg(m_ui->lineEditMqttTopic->text()).arg(Names::MqttPublishPath));
+    m_ui->checkBoxPublishOutput->setText(QString("Publish output in topic %1/%2").arg(m_ui->lineEditMqttTopic->text()).arg(Names::MqttPowershellSubtopic));
     m_ui->tabWidget->setCurrentIndex(0);
     if(m_firstStart) {
         show(); //start minimized to system tray after first start
@@ -36,7 +39,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), m_ui(new Ui::Main
 
 MainWindow::~MainWindow()
 {
-    m_iWebSocket->closeConnection();
+    delete m_endpoint;
+    delete m_iWebSocket;
+    delete m_iMqtt;
+    delete m_audioDevice;
+    delete m_sysTrayIcon;
     delete m_ui;
 }
 
@@ -54,6 +61,19 @@ void MainWindow::log(const QString &logtext)
 {
     if(logtext.isEmpty()) return;
 
+    bool dateChanged = false;
+
+    static QString datestr = "";
+    if(datestr != QDateTime::currentDateTime().date().toString()) {
+        dateChanged = true;
+    }
+
+    datestr = QDateTime::currentDateTime().date().toString();
+    QString daySeparator = QString("<p style=\"font-family:'Segoe UI'; margin:0;\">📅 <b>%1</b></p>").arg(datestr);
+
+    if(dateChanged) {
+        m_ui->textLog->append(daySeparator);
+    }
     m_ui->textLog->append(QString("<b>[%1]</b> %2").arg(timestamp()).arg(logtext));
     m_ui->textLog->repaint();
 }
@@ -76,9 +96,18 @@ void MainWindow::removeFromRegistry(const QString &key)
     settings.remove(key);
 }
 
-void MainWindow::onStatusReceived(const QString &status)
+void MainWindow::onStatusReceived(const QString &status, const QString &sender)
 {
-    log(status);
+    if(sender.isEmpty()) {
+        log(status);
+    } else if(sender == "InputMqtt") {
+        log(QString("<font color='purple'>[MQTT]</font> %2").arg(status));
+    } else if(sender == "InputWebSocket") {
+        log(QString("<font color='orange'>[WebSocket]</font> %2").arg(status));
+    } else {
+        log(QString("[%1] %2").arg(sender).arg(status));
+    }
+
     if(m_ui->checkBoxAllowPopups->isChecked()) {
         m_sysTrayIcon->showMessage("Status update", status);
     }
@@ -119,7 +148,7 @@ void MainWindow::setupAudioCombobox(const QVector<QString> &audio)
 
 void MainWindow::setupPayloadCombobox()
 {
-    QStringList functions = Names::functions;
+    QStringList functions = Names::Functions;
     // Don't iterate first and last elements since they are not interesting
     for(int i = 1; i < m_ui->verticalLayoutPayloadMap->count() - 1; ++i) {
         QLayout *layout = m_ui->verticalLayoutPayloadMap->itemAt(i)->layout();
@@ -238,12 +267,18 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* r
         return true;
     } else if(msg->message == WM_POWERBROADCAST) {
         switch(msg->wParam) {
-        case PBT_APMSUSPEND:
-            log("System suspending");
-            break;
-        case PBT_APMRESUMESUSPEND:
-            log("System waking up, reconnecting...");
-            break;
+            case PBT_APMSUSPEND: {
+                log("System suspending");
+                mqttPublish("System suspending");
+                websocketPublish("System suspending");
+                break;
+            }
+            case PBT_APMRESUMESUSPEND: {
+                log("System waking up, reconnecting...");
+                mqttPublish("System up");
+                websocketPublish("System up");
+                break;
+            }
         }
     }
     return false;
@@ -317,9 +352,7 @@ void MainWindow::loadSettingsFromRegistry()
 void MainWindow::savePayloadMap()
 {
     QJsonObject payloadObject;
-    QJsonArray payloadArr;
-    QJsonArray functionArr;
-    QJsonArray argumentArr;
+    QJsonArray payloadArr, functionArr, argumentArr;
     QList<int> emptyRows;
 
     auto payloadTable = m_ui->tableWidget;
@@ -473,7 +506,7 @@ void MainWindow::on_checkBoxExecPermission_stateChanged(int arg1)
 
 void MainWindow::on_lineEditMqttTopic_textChanged(const QString &arg1)
 {
-    m_ui->checkBoxPublishOutput->setText(QString("Publish output in topic %1%2").arg(arg1).arg(Names::MqttPublishPath));
+    m_ui->checkBoxPublishOutput->setText(QString("Publish output in topic %1/%2").arg(arg1).arg(Names::MqttPowershellSubtopic));
 }
 
 void MainWindow::on_pushButtonRefreshDisplays_clicked()

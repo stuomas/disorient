@@ -51,7 +51,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_5">
        <attribute name="icon">
@@ -504,7 +504,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>Topic</string>
+                  <string>Root topic</string>
                  </property>
                 </widget>
                </item>
@@ -873,7 +873,7 @@ margin-bottom: 2px;</string>
              <item>
               <widget class="QComboBox" name="comboBoxDisplayList">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -887,7 +887,7 @@ margin-bottom: 2px;</string>
                <property name="maximumSize">
                 <size>
                  <width>2000</width>
-                 <height>20</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="baseSize">
@@ -1022,7 +1022,7 @@ margin-bottom: 2px;</string>
              <item>
               <widget class="QComboBox" name="comboBoxAudioList">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1030,7 +1030,7 @@ margin-bottom: 2px;</string>
                <property name="maximumSize">
                 <size>
                  <width>2000</width>
-                 <height>20</height>
+                 <height>30</height>
                 </size>
                </property>
               </widget>
@@ -1130,7 +1130,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Run a script. Give the full &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;path&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; as argument.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Execute unrecognized payloads&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Checking &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-style:italic;&quot;&gt;Attempt to execute unrecognized payloads in PowerShell &lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;will blindly try to execute any incoming payload that is not mapped to a function.&lt;/span&gt;&lt;span style=&quot; font-size:10pt; color:#bc0000;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#bc0000;&quot;&gt;This is dangerous&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, so use only if your systems are secure and you know what you are doing. It is better to write a script and use the &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-style:italic;&quot;&gt;Run script&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; function. Checking &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-style:italic;&quot;&gt;Publish output &lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;will publish the standard output/error of the attempt in yourtopic/output.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Checking &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-style:italic;&quot;&gt;Attempt to execute unrecognized payloads in PowerShell &lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;will blindly try to execute any incoming payload that is not mapped to a function.&lt;/span&gt;&lt;span style=&quot; font-size:10pt; color:#bc0000;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#bc0000;&quot;&gt;This is dangerous&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;, so use only if your systems are secure and you know what you are doing. It is better to write a script and use the &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-style:italic;&quot;&gt;Run script&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; function. Checking &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-style:italic;&quot;&gt;Publish output &lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;will publish the standard output/error of the attempt in topic/powershell/response.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
