@@ -38,7 +38,6 @@ public:
     void log(const QString &logtext);
     void setupDisplayCombobox(const QVector<DISPLAY_DEVICE> &displays);
     void setupAudioCombobox(const QVector<QString> &audio);
-    void setupPayloadCombobox();
     void setupHotkeys();
     void setupPayloadTable();
     void setupStyles();

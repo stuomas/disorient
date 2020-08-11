@@ -107,6 +107,8 @@ QString Endpoint::rearrangeDisplays(int idxPrimary, int idxSecondary)
     EnumDisplaySettings(allDisplayAdapters[idxPrimary].DeviceName, ENUM_CURRENT_SETTINGS, &dmPri);
     EnumDisplaySettings(allDisplayAdapters[idxSecondary].DeviceName, ENUM_CURRENT_SETTINGS, &dmSec);
 
+    qDebug() << "Primary" << allDisplayAdapters[idxPrimary].DeviceName;
+    qDebug() << "Secondary" << allDisplayAdapters[idxSecondary].DeviceName;
     //Save position of current secondary monitor
     auto oldPosX = dmPri.dmPosition.x;
     auto oldPosY = dmPri.dmPosition.y;
@@ -164,16 +166,16 @@ void Endpoint::onMessageReceived(const QString &msg)
         }
     }
 
-    /***********************************************************************
-    ** Unrecognized message when functionName has not been assigned anything
-    ************************************************************************/
-    if(functionName.isEmpty()) {
+    /************************************************************************
+    ** Unrecognized message when functionName and payloadName are still empty
+    *************************************************************************/
+    if(functionName.isEmpty() && payloadName.isEmpty()) {
         unrecognizedMsg = true;
         emit statusToLog("Unrecognized message: " + msg, origin);
     }
-    /***********************************************************************
+    /************************************************************************
     ** Rotate screen (index, angle)
-    ************************************************************************/
+    *************************************************************************/
     else if(functionName == Names::Functions.at(1)) {
         QStringList args = functionArg.split(",");
         for(auto& str : args) {
@@ -192,15 +194,15 @@ void Endpoint::onMessageReceived(const QString &msg)
             }
         }
     }
-    /***********************************************************************
+    /************************************************************************
     ** Set audio device (name)
-    ************************************************************************/
+    *************************************************************************/
     else if(functionName == Names::Functions.at(2)) {
         emit changeAudioDevice(functionArg);
     }
-    /***********************************************************************
+    /************************************************************************
     ** Arrange displays (index1, index2)
-    ************************************************************************/
+    *************************************************************************/
     else if(functionName == Names::Functions.at(3)) {
         QStringList args = functionArg.split(",");
         for(auto& str : args) {
@@ -212,9 +214,9 @@ void Endpoint::onMessageReceived(const QString &msg)
             lastActionStatus = rearrangeDisplays(args.at(0).toInt(), args.at(1).toInt());
         }
     }
-    /***********************************************************************
+    /************************************************************************
     ** Run executable (path)
-    ************************************************************************/
+    *************************************************************************/
     else if(functionName == Names::Functions.at(4)) {
         QStringList args(functionArg.split(","));
         for(auto& str : args) {

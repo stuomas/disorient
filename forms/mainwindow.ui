@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>860</height>
+    <height>780</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -51,7 +51,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_5">
        <attribute name="icon">
@@ -587,7 +587,7 @@
              <item>
               <widget class="QCheckBox" name="checkBoxSaveCredentials">
                <property name="text">
-                <string>Remember credentials (will be saved in plain text)</string>
+                <string>Remember credentials (will be saved unencrypted)</string>
                </property>
               </widget>
              </item>

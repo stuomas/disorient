@@ -1,6 +1,7 @@
 #include "comboboxitemdelegate.h"
 #include <QComboBox>
 #include <QDebug>
+#include "constants.h"
 
 ComboBoxItemDelegate::ComboBoxItemDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
@@ -13,10 +14,9 @@ ComboBoxItemDelegate::~ComboBoxItemDelegate()
 
 QWidget *ComboBoxItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    QStringList functions = {"", "Rotate screen (index, angle)", "Set audio device (name)", "Arrange displays (index1, index2)", "Run executable (path)"};
     // Create the combobox and populate it
     QComboBox *cb = new QComboBox(parent);
-    cb->addItems(functions);
+    cb->addItems(Names::Functions);
     cb->setCurrentIndex(1);
     return cb;
 }

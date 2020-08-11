@@ -25,7 +25,7 @@ public:
     void reconnect();
 
 signals:
-    void messageToScreen(const QString &msg);
+    void messageToEndpoint(const QString &msg);
     void statusToLog(const QString &msg, const QString &sender = Names::InputWebSocketName);
 
 public slots:

@@ -14,8 +14,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), m_ui(new Ui::Main
     connect(m_endpoint, &Endpoint::mqttPublish, m_iMqtt, &InputMqtt::onPublish);
     connect(m_endpoint, &Endpoint::websocketPublish, m_iWebSocket, &InputWebSocket::onPublish);
     connect(m_endpoint, &Endpoint::changeAudioDevice, m_audioDevice, &AudioEndpointController::onChangeRequest);
-    connect(m_iWebSocket, &InputWebSocket::messageToScreen, m_endpoint, &Endpoint::onMessageReceived);
-    connect(m_iMqtt, &InputMqtt::messageToScreen, m_endpoint, &Endpoint::onMessageReceived);
+    connect(m_iWebSocket, &InputWebSocket::messageToEndpoint, m_endpoint, &Endpoint::onMessageReceived);
+    connect(m_iMqtt, &InputMqtt::messageToEndpoint, m_endpoint, &Endpoint::onMessageReceived);
 
     m_ui->setupUi(this);
     log(QString("%1 started").arg(Names::SettingApplication));
@@ -23,7 +23,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), m_ui(new Ui::Main
     setupDisplayCombobox(m_endpoint->getDisplays());
     setupAudioCombobox(m_audioDevice->getAllAudioDevices());
     setupHotkeys();
-    setupPayloadCombobox();
     setupPayloadTable();
     loadSettingsFromRegistry();
     setupStyles();
@@ -143,17 +142,6 @@ void MainWindow::setupAudioCombobox(const QVector<QString> &audio)
 {
     for(auto i : audio) {
         m_ui->comboBoxAudioList->addItem(i);
-    }
-}
-
-void MainWindow::setupPayloadCombobox()
-{
-    QStringList functions = Names::Functions;
-    // Don't iterate first and last elements since they are not interesting
-    for(int i = 1; i < m_ui->verticalLayoutPayloadMap->count() - 1; ++i) {
-        QLayout *layout = m_ui->verticalLayoutPayloadMap->itemAt(i)->layout();
-        QComboBox* functionCombo = dynamic_cast<QComboBox*>(layout->itemAt(1)->widget());
-        functionCombo->addItems(functions);
     }
 }
 

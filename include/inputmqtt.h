@@ -11,7 +11,7 @@ class InputMqtt : public QObject
     Q_OBJECT
 
 signals:
-    void messageToScreen(const QString &msg);
+    void messageToEndpoint(const QString &msg);
     void statusToLog(const QString &msg, const QString &sender = Names::InputMqttName);
 
 public:

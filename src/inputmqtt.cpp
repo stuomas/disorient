@@ -132,6 +132,6 @@ void InputMqtt::onPublish(const QString &msg, const QString &subtopic)
 
 void InputMqtt::onMessageReceived(const QString &msg)
 {
-    emit messageToScreen(msg);
+    emit messageToEndpoint(msg);
 }
 

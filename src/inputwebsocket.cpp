@@ -77,7 +77,7 @@ void InputWebSocket::onDisconnected()
 
 void InputWebSocket::onTextMessageReceived(const QString &msg)
 {
-    emit messageToScreen(msg);
+    emit messageToEndpoint(msg);
 }
 
 void InputWebSocket::onError(const QAbstractSocket::SocketError &error)
