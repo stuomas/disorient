@@ -47,9 +47,9 @@ Swap places of two displays, the `index1` becoming primary display and `index2` 
 
 Set default (active) audio device. Get the correct `name` from the audio list in the Help tab, in exactly same format. This is the name that can be given to the device in Windows Sound Control Panel. Give the devices simple nicknames to make your life easier.
 
-> Run executable (path)
+> Run executable (path, args)
 
-Run a script or an executable. Give the full `path` as argument. File extensions `ps1`, `bat`, `cmd`, and `exe` supported.
+Run a script or an executable. Give the full `path` as argument. If the executable takes arguments, add them as `args`. File extensions `ps1`, `bat`, `cmd`, and `exe` supported. 
 
 #### Execute unrecognized payloads
 

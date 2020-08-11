@@ -27,7 +27,7 @@ const QString InputMqttName = "InputMqtt";
 const QString InputWebSocketName = "InputWebSocket";
 const QString MqttResponseSubtopic = "response";
 const QString MqttPowershellSubtopic = QString("%1/%2").arg("powershell").arg(MqttResponseSubtopic);
-const QStringList Functions = {"", "Rotate screen (index, angle)", "Set audio device (name)", "Arrange displays (index1, index2)", "Run executable (path)"};
+const QStringList Functions = {"", "Rotate screen (index, angle)", "Set audio device (name)", "Arrange displays (index1, index2)", "Run executable (path, args)"};
 }
 
 #endif // CONSTANTS_H
