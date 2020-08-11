@@ -14,7 +14,7 @@ Some example use cases include
 
 ## Installation
 
-No installation required. Launch the executable, choose settings and forget.
+No installation required. Launch the executable, choose settings and forget. Download latest pre-built executable from [releases](https://github.com/stuomas/disorient/releases/) or [build](#development) from sources.
 
 ## Usage
 
