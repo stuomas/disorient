@@ -49,7 +49,7 @@ Set default (active) audio device. Get the correct `name` from the audio list in
 
 > Run executable (path, args)
 
-Run a script or an executable. Give the full `path` as argument. If the executable takes arguments, add them as `args`. File extensions `ps1`, `bat`, `cmd`, and `exe` supported. 
+Run a script or an executable. Give the full `path` as argument. If the executable takes arguments, add them as `args`. 
 
 #### Execute unrecognized payloads
 
