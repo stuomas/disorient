@@ -166,6 +166,12 @@ void Endpoint::onMessageReceived(const QString &msg)
         }
     }
 
+    QStringList args = functionArg.split(",");
+    for(auto& str : args) {
+        str = str.trimmed();
+        str.replace("$$", payloadName); //Replace $$ in arguments with the payloadName, might be useful
+    }
+
     /************************************************************************
     ** Unrecognized message when functionName and payloadName are still empty
     *************************************************************************/
@@ -177,10 +183,6 @@ void Endpoint::onMessageReceived(const QString &msg)
     ** Rotate screen (index, angle)
     *************************************************************************/
     else if(functionName == Names::Functions.at(1)) {
-        QStringList args = functionArg.split(",");
-        for(auto& str : args) {
-            str = str.trimmed();
-        }
         if(args.size() < 2) {
             lastActionStatus = "Invalid arguments";
         } else {
@@ -188,7 +190,6 @@ void Endpoint::onMessageReceived(const QString &msg)
             int angle = args.at(1).toInt(&ok);
             lastActionStatus = "Invalid angle";
             if(ok) {
-                QStringList args = functionArg.split(",");
                 enumerateSettings(args.at(0).toInt());
                 lastActionStatus = flip(angle);
             }
@@ -204,10 +205,6 @@ void Endpoint::onMessageReceived(const QString &msg)
     ** Arrange displays (index1, index2)
     *************************************************************************/
     else if(functionName == Names::Functions.at(3)) {
-        QStringList args = functionArg.split(",");
-        for(auto& str : args) {
-            str = str.trimmed();
-        }
         if(args.size() < 2) {
             lastActionStatus = "Invalid arguments";
         } else {
@@ -218,16 +215,9 @@ void Endpoint::onMessageReceived(const QString &msg)
     ** Run executable (path)
     *************************************************************************/
     else if(functionName == Names::Functions.at(4)) {
-        QStringList args(functionArg.split(","));
-        for(auto& str : args) {
-            str = str.trimmed();
-        }
         QString path = args.at(0);
-        if(path.endsWith(".ps1")) {
-            QProcess::startDetached("powershell", args);
-        } else if(path.endsWith(".bat") || path.endsWith(".cmd")) {
-            args.prepend("/c");
-            QProcess::startDetached("cmd", args);
+        if(path.endsWith(".ps1") || path.endsWith(".bat") || path.endsWith(".cmd")) {
+            lastActionStatus = runInPowershell(args);
         } else {
             args.takeFirst();
             QProcess::startDetached(path, args);
@@ -236,18 +226,10 @@ void Endpoint::onMessageReceived(const QString &msg)
 
     if(m_rawExecPermission && unrecognizedMsg && !msg.trimmed().isEmpty()) {
         emit statusToLog("Attempting to execute in PowerShell");
-        QProcess powershell;
-        QString cmd("powershell");
-        QStringList parameters{msg};
-        powershell.setReadChannel(QProcess::StandardOutput);
-        powershell.start(cmd, parameters, QIODevice::ReadWrite);
-        powershell.waitForReadyRead(10000);
-        QString stdErr = powershell.readAllStandardError().trimmed();
-        QString stdOut = powershell.readAllStandardOutput().trimmed();
-        emit statusToLog("Output: " + stdErr + stdOut);
-        powershell.close();
+        QString output = runInPowershell({msg});
+        emit statusToLog("Output: " + output);
         if(m_rawExecPublish) {
-            sendResponse(origin, stdErr + stdOut, Names::MqttPowershellSubtopic);
+            sendResponse(origin, output, Names::MqttPowershellSubtopic);
         }
     } else if(!unrecognizedMsg) {
         emit statusToLog(QString("%1 (%2)").arg(payloadName).arg(lastActionStatus), origin);
@@ -255,6 +237,20 @@ void Endpoint::onMessageReceived(const QString &msg)
     } else {
         sendResponse(origin, "Unrecognized message", QString("%1/%2").arg(msg).arg(Names::MqttResponseSubtopic));
     }
+}
+
+QString Endpoint::runInPowershell(const QStringList &args)
+{
+    QProcess powershell;
+    QString cmd("powershell");
+    QStringList parameters{args};
+    powershell.setProcessChannelMode(QProcess::MergedChannels);
+    powershell.setReadChannel(QProcess::StandardOutput);
+    powershell.start(cmd, parameters, QIODevice::ReadWrite);
+    powershell.waitForFinished(3000);
+    QString stdOut = powershell.readAllStandardOutput().trimmed();
+    powershell.close();
+    return stdOut;
 }
 
 void Endpoint::sendResponse(const QString &sender, const QString &response, const QString &topic)

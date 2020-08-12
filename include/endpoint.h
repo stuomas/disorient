@@ -26,6 +26,7 @@ public:
     void setPayloadMap(QJsonObject payload) { m_payloadMap = payload; }
     QString getWinApiStatus(LONG status);
     void sendResponse(const QString &sender, const QString &topic, const QString &response);
+    QString runInPowershell(const QStringList &args);
 
 signals:
     void statusToLog(const QString &status, const QString &sender = "");

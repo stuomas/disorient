@@ -24,7 +24,7 @@ In the settings tab, set up the connection to your MQTT broker or WebSocket serv
 
 ### Payload mapping
 
-Map any text coming from MQTT or WebSocket server to a function of choice. The function list below explains what arguments are needed.
+Map any text coming from MQTT or WebSocket server to a function of choice. The function list below explains what arguments are needed. You can use `$$` anywhere in the arguments to use the payload name in its place, for example argument `C:\Users\Desktop\$$.exe` with payload `myexe` will become `C:\Users\Desktop\myexe.exe`.
 
 #### Functions
 
