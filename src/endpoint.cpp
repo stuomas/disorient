@@ -228,11 +228,9 @@ void Endpoint::onMessageReceived(const QString &msg)
         } else if(path.endsWith(".bat") || path.endsWith(".cmd")) {
             args.prepend("/c");
             QProcess::startDetached("cmd", args);
-        } else if(path.endsWith(".exe")){
+        } else {
             args.takeFirst();
             QProcess::startDetached(path, args);
-        } else {
-            lastActionStatus = "Unrecognized file extension";
         }
     }
 
