@@ -9,5 +9,9 @@ int main(int argc, char *argv[])
     a.setFont(QFont("Tahoma", 10, QFont::Normal), "QWidget");
     a.setFont(QFont("Consolas", 10, QFont::Normal), "QTextEdit");
     MainWindow w;
+    QString windowTitle = "Disorient " + QCoreApplication::applicationVersion();
+    windowTitle.chop(2);
+    w.setWindowTitle(windowTitle);
+
     return a.exec();
 }
