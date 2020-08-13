@@ -163,7 +163,13 @@ void MainWindow::setupPayloadTable()
     payloadTable->setItemDelegateForColumn(1, cbid);
     payloadTable->setColumnCount(3);
     payloadTable->setHorizontalHeaderLabels({"Payload", "Function", "Arguments"});
-    payloadTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    //payloadTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    //payloadTable->horizontalHeader()->setStretchLastSection(true);
+    payloadTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Interactive);
+    payloadTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Interactive);
+    payloadTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+    payloadTable->setColumnWidth(0, 130);
+    payloadTable->setColumnWidth(1, 200);
     payloadTable->setRowCount(10);
 
     QPushButton *pushButtonAdd = new QPushButton("", m_ui->tableWidget);
@@ -319,6 +325,11 @@ void MainWindow::loadSettingsFromRegistry()
     QUrl lastMqttUrl = readFromRegistry(Names::SettingLastMqttAddress).toUrl();
     m_ui->lineEditMqttBroker->setText(lastMqttUrl.toString());
     m_iMqtt->setBroker(lastMqttUrl);
+
+    //Allow positional arguments
+    bool wildcardPerm = readFromRegistry(Names::SettingAllowWildcards).toBool();
+    m_ui->checkBoxAllowWildcards->setChecked(wildcardPerm);
+    m_endpoint->setAllowWildcards(wildcardPerm);
 
     //Raw message execution permission
     bool execPerm = readFromRegistry(Names::SettingRawExecPermission).toBool();
@@ -477,6 +488,10 @@ void MainWindow::on_pushButtonSaveSettings_clicked()
     //Payload mapping
     savePayloadMap();
     writeToRegistry(Names::SettingPayloadMap, m_payloadMap);
+
+    //Allow positional arguments
+    m_endpoint->setAllowWildcards(m_ui->checkBoxAllowWildcards->isChecked());
+    writeToRegistry(Names::SettingAllowWildcards, m_ui->checkBoxAllowWildcards->isChecked());
 
     //Raw message execution permission
     m_endpoint->setRawExecPermission(m_ui->checkBoxExecPermission->isChecked());

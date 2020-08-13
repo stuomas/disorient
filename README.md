@@ -24,7 +24,7 @@ In the settings tab, set up the connection to your MQTT broker or WebSocket serv
 
 ### Payload mapping
 
-Map any text coming from MQTT or WebSocket server to a function of choice. The function list below explains what arguments are needed. You can use `$$` anywhere in the arguments to use the payload name in its place, for example argument `C:\Users\Desktop\$$.exe` with payload `myexe` will become `C:\Users\Desktop\myexe.exe`.
+Map any text coming from MQTT or WebSocket server to a function of choice. The function list below explains what arguments are needed.
 
 #### Functions
 
@@ -49,7 +49,11 @@ Set default (active) audio device. Get the correct `name` from the audio list in
 
 > Run executable (path, args)
 
-Run a script or an executable. Give the full `path` as argument. If the executable takes arguments, add them as `args`. 
+Run a script or an executable. Give the full `path` as argument. If the executable takes arguments, add them as comma-separated list in `args`.
+
+#### Allow keyword arguments in payloads
+
+Checking this option allows you to add keyword arguments to your incoming payload in the form of a query string, for example `mypayload?key1=value1,key2=value2,key3=value3` and so forth. The keys can be named freely. The keywords can then be referred in the arguments field with `$keyname`.
 
 #### Execute unrecognized payloads
 

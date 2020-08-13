@@ -21,6 +21,7 @@ const QString SettingPayloadMap = "dis_opt_11";
 const QString SettingRawExecPermission = "dis_opt_12";
 const QString SettingPublishOutput = "dis_opt_13";
 const QString SettingSaveCredentials = "dis_opt_14";
+const QString SettingAllowWildcards = "dis_opt_15";
 
 //Other stuff
 const QString InputMqttName = "InputMqtt";

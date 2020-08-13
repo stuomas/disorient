@@ -150,8 +150,21 @@ void Endpoint::adjustResolution(int angle, unsigned long &w, unsigned long &h)
 void Endpoint::onMessageReceived(const QString &msg)
 {
     QString origin = sender()->objectName();
-
     QString lastActionStatus, functionName, functionArg, payloadName;
+    QStringList wildcardList;
+    QStringList splitMsg = msg.split("?");
+    QString baseMsg = splitMsg.at(0);
+    QMap<QString, QString> wildcardMap;
+
+    if(splitMsg.size() > 1) {
+        wildcardList = splitMsg.at(1).split(",");
+        for(auto str : wildcardList) {
+            if(str.split("=").size() > 1) {
+                wildcardMap.insert("$" + str.split("=").at(0).trimmed(), str.split("=").at(1).trimmed());
+            }
+        }
+    }
+
     QJsonObject payloads = m_payloadMap;
     QJsonArray payloadArr = payloads.value("payload").toArray();
     QJsonArray functionArr = payloads.value("function").toArray();
@@ -159,7 +172,7 @@ void Endpoint::onMessageReceived(const QString &msg)
     bool unrecognizedMsg = false;
 
     for(int i = 0; i < payloadArr.size(); ++i) {
-        if(payloadArr[i].toString() == msg) {
+        if(payloadArr[i].toString() == baseMsg) {
             functionName = functionArr[i].toString();
             functionArg = argumentArr[i].toString();
             payloadName = payloadArr[i].toString();
@@ -170,6 +183,11 @@ void Endpoint::onMessageReceived(const QString &msg)
     for(auto& str : args) {
         str = str.trimmed();
         str.replace("$$", payloadName); //Replace $$ in arguments with the payloadName, might be useful
+        if(m_wildcardsAllowed) {
+            for(auto wc : wildcardMap.toStdMap()) {
+                str.replace(wc.first, wc.second);
+            }
+        }
     }
 
     /************************************************************************

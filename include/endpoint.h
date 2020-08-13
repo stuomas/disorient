@@ -22,6 +22,7 @@ public:
     QVector<DISPLAY_DEVICE> getDisplays() { return allDisplayMonitors; }
     void setChosenDisplay(int displayNum) { chosenDisplay = allDisplayAdapters[displayNum]; }
     void setRawExecPermission(bool setting) { m_rawExecPermission = setting; }
+    void setAllowWildcards(bool setting) { m_wildcardsAllowed = setting; }
     void setRawExecPublish(bool setting) { m_rawExecPublish = setting; }
     void setPayloadMap(QJsonObject payload) { m_payloadMap = payload; }
     QString getWinApiStatus(LONG status);
@@ -41,6 +42,7 @@ private:
     DEVMODE dm;
     bool m_rawExecPermission = false;
     bool m_rawExecPublish = false;
+    bool m_wildcardsAllowed = false;
     QJsonObject m_payloadMap;
 
     //Some weird WinAPI quirks, maybe there is a better way
