@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include "constants.h"
 #include <QJsonArray>
+#include <QFileDialog>
+#include <QJsonDocument>
 #include "comboboxitemdelegate.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), m_ui(new Ui::MainWindow), m_endpoint(new Endpoint), m_iWebSocket(new InputWebSocket), m_iMqtt(new InputMqtt), m_audioDevice(new AudioEndpointController)
@@ -280,6 +282,9 @@ bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* r
 
 void MainWindow::loadSettingsFromRegistry()
 {
+    restoreGeometry(readFromRegistry("geometry").toByteArray());
+    restoreState(readFromRegistry("windowState").toByteArray());
+
     //Setting for last known WebSocket address
     QUrl lastWsUrl = readFromRegistry(Names::SettingLastWsAddress).toUrl();
     m_ui->lineEditWebSocketAddr->setText(lastWsUrl.toString());
@@ -383,9 +388,14 @@ void MainWindow::savePayloadMap()
     payloadTable->repaint();
 }
 
-void MainWindow::loadPayloadMap()
+void MainWindow::loadPayloadMap(const QJsonDocument &file)
 {
-    QJsonObject payloadObject = readFromRegistry(Names::SettingPayloadMap).toJsonObject();
+    QJsonObject payloadObject;
+    if(file.isEmpty()) {
+        payloadObject = readFromRegistry(Names::SettingPayloadMap).toJsonObject();
+    } else {
+        payloadObject = file.object();
+    }
 
     auto payloadTable = m_ui->tableWidget;
 
@@ -420,6 +430,9 @@ void MainWindow::loadPayloadMap()
 
 void MainWindow::on_pushButtonSaveSettings_clicked()
 {
+    writeToRegistry("geometry", saveGeometry());
+    writeToRegistry("windowState", saveState());
+
     //Autostart enabled
     QSettings bootSettings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     QString path = QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
@@ -524,4 +537,30 @@ void MainWindow::on_pushButtonRefreshAudio_clicked()
     m_audioDevice->refreshList();
     m_ui->comboBoxAudioList->clear();
     setupAudioCombobox(m_audioDevice->getAllAudioDevices());
+}
+
+void MainWindow::on_pushButtonExportPayloadMap_clicked()
+{
+    QJsonDocument doc;
+    doc.setObject(m_payloadMap);
+    QString fileName = QFileDialog::getSaveFileName(this, "Save Payload Mapping", "", "JSON (*.json)");
+    if(fileName.isEmpty())
+        return;
+    else {
+       QFile file(fileName);
+       file.open(QFile::WriteOnly | QFile::Text | QFile::Truncate);
+       file.write(doc.toJson(QJsonDocument::Compact));
+       file.close();
+   }
+}
+
+void MainWindow::on_pushButtonImportPayloadMap_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, "Load Payload Mapping", "", "JSON (*.json)");
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QJsonParseError jsonParseError;
+    QJsonDocument importFile = QJsonDocument::fromJson(file.readAll(), &jsonParseError);
+    file.close();
+    loadPayloadMap(importFile);
 }

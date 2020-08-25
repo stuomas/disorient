@@ -9,5 +9,7 @@
         <file>icons/status.png</file>
         <file>icons/icon.ico</file>
         <file>icons/plus.png</file>
+        <file>icons/export.png</file>
+        <file>icons/import.png</file>
     </qresource>
 </RCC>

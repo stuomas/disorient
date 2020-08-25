@@ -61,7 +61,7 @@ Checking *Attempt to execute unrecognized payloads in PowerShell* will blindly t
 
 #### Responses
 
-When the function has run, a response will be published in topic `<chosen_topic>/<payload_name>/response` with a message, which in some cases is empty. For WebSocket, a text message with the format `<payload_name>/response/message` is sent back to the server. The response can be used as an acknoledgement that the command was received and executed.
+When the function has run, a response will be published in topic `<chosen_topic>/<payload_name>/response` with a message, which in some cases is empty. For WebSocket, a text message with the format `<payload_name>/response/message` is sent back to the server. The response can be used as an acknowledgement that the command was received and executed.
 
 ## Screenshots
 

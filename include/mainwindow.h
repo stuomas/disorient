@@ -13,6 +13,7 @@
 #include <QDateTime>
 #include <QComboBox>
 #include <QJsonObject>
+#include <QJsonDocument>
 #include "endpoint.h"
 #include "inputwebsocket.h"
 #include "inputmqtt.h"
@@ -42,7 +43,7 @@ public:
     void setupPayloadTable();
     void setupStyles();
     void savePayloadMap();
-    void loadPayloadMap();
+    void loadPayloadMap(const QJsonDocument &file = QJsonDocument());
     QString timestamp();
     QVector<QString> getAllAudioDevices();
     void removeFromRegistry(const QString &key);
@@ -59,6 +60,8 @@ private slots:
     void on_lineEditMqttTopic_textChanged(const QString &arg1);
     void on_pushButtonRefreshDisplays_clicked();
     void on_pushButtonRefreshAudio_clicked();
+    void on_pushButtonExportPayloadMap_clicked();
+    void on_pushButtonImportPayloadMap_clicked();
 
 private:
     Ui::MainWindow *m_ui;
