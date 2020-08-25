@@ -3,6 +3,7 @@
 #include <QProcess>
 #include <QJsonArray>
 #include <QDir>
+#include <QUrlQuery>
 
 Endpoint::Endpoint()
 {
@@ -155,15 +156,18 @@ void Endpoint::onMessageReceived(const QString &msg)
     QStringList splitMsg = msg.split("?");
     QString baseMsg = splitMsg.at(0);
     QMap<QString, QString> wildcardMap;
+    QRegExp queryPairDelimiter("(\\,|\\&)"); // accepts '&' and ',' between pairs
 
     if(splitMsg.size() > 1) {
-        wildcardList = splitMsg.at(1).split(",");
+        wildcardList = splitMsg.at(1).split(queryPairDelimiter);
         for(auto str : wildcardList) {
             if(str.split("=").size() > 1) {
                 wildcardMap.insert("$" + str.split("=").at(0).trimmed(), str.split("=").at(1).trimmed());
             }
         }
     }
+
+    qDebug() << wildcardMap;
 
     QJsonObject payloads = m_payloadMap;
     QJsonArray payloadArr = payloads.value("payload").toArray();
