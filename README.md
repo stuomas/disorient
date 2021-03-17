@@ -50,6 +50,7 @@ Set default (active) audio device. Get the correct `name` from the audio list in
 > Run executable (path, args)
 
 Run a script or an executable. Give the full `path` as argument. If the executable takes arguments, add them as comma-separated list in `args`.
+Notice that if you want to run executables from System32 folder, you might need to use `Sysnative` virtual folder instead of System32, for example `C:\Windows\Sysnative\DisplaySwitch.exe`<sup>[[1]](https://www.samlogic.net/articles/sysnative-folder-64-bit-windows.htm)</sup>.
 
 #### Allow keyword arguments in payloads
 
